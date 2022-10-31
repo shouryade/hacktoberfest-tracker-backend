@@ -4,9 +4,14 @@ import { Base} from "./utils/base";
 @Entity('org') 
 export class Org extends Base{
 
-    @Column()
+    @Column({
+        type:"numeric"
+    })
     totalRepos:number
 
-    @Column()
+    @Column({
+        type:"json"
+    }
+    )
     totalRepoList:object
 }

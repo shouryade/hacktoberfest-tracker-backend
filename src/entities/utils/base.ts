@@ -1,26 +1,40 @@
 import { BaseEntity,Column,Entity, PrimaryColumn } from "typeorm"
 
-@Entity()
-export class Base extends BaseEntity {
+@Entity('base')
+export class Base{
     
-    @PrimaryColumn({})
-    id:string
+    @PrimaryColumn({
+        type:"numeric"
+    })
+    id:number
 
-    @Column()
+    @Column({
+        type:"numeric"
+    })
     totalContributions:number
 
-    @Column()
+    @Column({
+        type:"numeric"
+    })
     totalCommits:number
 
-    @Column()
+    @Column({
+        type:"numeric"
+    })
     totalIssues:number
 
-    @Column()
+    @Column({
+        type:"json"
+    })
     contributorList:object
 
-    @Column()
+    @Column({
+        type:"json"
+    })
     issueList:object
 
-    @Column()
+    @Column({
+        type:"json"
+    })
     contributionList:object
 }
