@@ -30,10 +30,14 @@ var Org = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     __decorate([
-        (0, typeorm_1.Column)()
+        (0, typeorm_1.Column)({
+            type: "numeric"
+        })
     ], Org.prototype, "totalRepos");
     __decorate([
-        (0, typeorm_1.Column)()
+        (0, typeorm_1.Column)({
+            type: "json"
+        })
     ], Org.prototype, "totalRepoList");
     Org = __decorate([
         (0, typeorm_1.Entity)('org')
