@@ -9,6 +9,11 @@ export class Base{
     id:number
 
     @Column({
+        type:"varchar"
+    })
+    uName:string
+
+    @Column({
         type:"numeric"
     })
     totalContributions:number

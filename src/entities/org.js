@@ -23,6 +23,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 exports.__esModule = true;
 exports.Org = void 0;
 var typeorm_1 = require("typeorm");
+var repo_1 = require("./repo");
 var base_1 = require("./utils/base");
 var Org = /** @class */ (function (_super) {
     __extends(Org, _super);
@@ -39,6 +40,9 @@ var Org = /** @class */ (function (_super) {
             type: "json"
         })
     ], Org.prototype, "totalRepoList");
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return repo_1.Repo; }, function (repo) { return repo.org; })
+    ], Org.prototype, "repos");
     Org = __decorate([
         (0, typeorm_1.Entity)('org')
     ], Org);

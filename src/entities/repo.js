@@ -23,12 +23,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 exports.__esModule = true;
 exports.Repo = void 0;
 var typeorm_1 = require("typeorm");
+var org_1 = require("./org");
 var base_1 = require("./utils/base");
 var Repo = /** @class */ (function (_super) {
     __extends(Repo, _super);
     function Repo() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return org_1.Org; }, function (org) { return org.repos; })
+    ], Repo.prototype, "org");
     Repo = __decorate([
         (0, typeorm_1.Entity)('repo')
     ], Repo);

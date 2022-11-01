@@ -18,6 +18,11 @@ var Base = /** @class */ (function () {
     ], Base.prototype, "id");
     __decorate([
         (0, typeorm_1.Column)({
+            type: "varchar"
+        })
+    ], Base.prototype, "uName");
+    __decorate([
+        (0, typeorm_1.Column)({
             type: "numeric"
         })
     ], Base.prototype, "totalContributions");
