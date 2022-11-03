@@ -6,12 +6,14 @@ import { Base} from "./utils/base";
 export class Org extends Base{
 
     @Column({
-        type:"numeric"
+        type:"numeric",
+        default:0
     })
     totalRepos:number
 
     @Column({
-        type:"json"
+        type:"json",
+        default:null
     })
     totalRepoList:object
 

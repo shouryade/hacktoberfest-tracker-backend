@@ -12,9 +12,7 @@ var Base = /** @class */ (function () {
     function Base() {
     }
     __decorate([
-        (0, typeorm_1.PrimaryColumn)({
-            type: "numeric"
-        })
+        (0, typeorm_1.PrimaryGeneratedColumn)()
     ], Base.prototype, "id");
     __decorate([
         (0, typeorm_1.Column)({
@@ -23,32 +21,38 @@ var Base = /** @class */ (function () {
     ], Base.prototype, "uName");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "numeric"
+            type: "numeric",
+            "default": 0
         })
     ], Base.prototype, "totalContributions");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "numeric"
+            type: "numeric",
+            "default": 0
         })
     ], Base.prototype, "totalCommits");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "numeric"
+            type: "numeric",
+            "default": 0
         })
     ], Base.prototype, "totalIssues");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "json"
+            type: "json",
+            "default": null
         })
     ], Base.prototype, "contributorList");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "json"
+            type: "json",
+            "default": null
         })
     ], Base.prototype, "issueList");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "json"
+            type: "json",
+            "default": null
         })
     ], Base.prototype, "contributionList");
     Base = __decorate([

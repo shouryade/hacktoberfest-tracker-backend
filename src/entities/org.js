@@ -32,12 +32,14 @@ var Org = /** @class */ (function (_super) {
     }
     __decorate([
         (0, typeorm_1.Column)({
-            type: "numeric"
+            type: "numeric",
+            "default": 0
         })
     ], Org.prototype, "totalRepos");
     __decorate([
         (0, typeorm_1.Column)({
-            type: "json"
+            type: "json",
+            "default": null
         })
     ], Org.prototype, "totalRepoList");
     __decorate([
