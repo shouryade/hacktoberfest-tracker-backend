@@ -4,6 +4,13 @@ import { Org } from "./entities/org";
 
 const octo = new Octokit({});
 
+AppDataSource.initialize()
+.then(() =>
+    console.log("Running")
+).catch((err) => {
+    console.log(err)
+});
+
 async function update(){
 
     const orgRepository = AppDataSource.getRepository(Org);
@@ -34,14 +41,7 @@ async function update(){
     // setTimeout(update,5000)
 }
 
-AppDataSource.initialize()
-.then(() =>
-    {console.log("Running");
-    update();
-}
-).catch((err) => {
-    console.log(err)
-});
+update()
 
 
 
