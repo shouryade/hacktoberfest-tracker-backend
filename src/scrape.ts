@@ -1,23 +1,22 @@
 import { Octokit, App } from "octokit";
 import { AppDataSource } from "./connenction";
 import { Org } from "./entities/org";
+
 const octo = new Octokit({});
 
 async function update(){
 
     const orgRepository = AppDataSource.getRepository(Org);
 
-    const listOrgs = await orgRepository.findOneBy({
-        uName:'arshi45'
-    })
-    // let count:number = length
+    const [listOrgs,length] = await orgRepository.findAndCount({select:['uName']})
+    let count:number = length
     console.log(listOrgs)
     // while(count--){
     //     const data = await octo.request("GET /users/{owner}/repos",{
     //         owner:listOrgs[count]
     //     });
     //     const newData = await orgRepository.findOneBy({
-    //         uName:listOrgs[count]
+    //         uName:listOrgs[count].uName
     //     });
     //     newData.contributionList = {list:['Arsh','Second']}
     //     newData.contributorList = {list:['Arsh','Second']}
@@ -30,12 +29,19 @@ async function update(){
     //     orgRepository.save(newData)
     // }
 
-    //const comments:any = await octo.request()
+    // const comments:any = await octo.request()
     
-    //setTimeout(update,5000)
+    // setTimeout(update,5000)
 }
 
-update()
+AppDataSource.initialize()
+.then(() =>
+    {console.log("Running");
+    update();
+}
+).catch((err) => {
+    console.log(err)
+});
 
 
 

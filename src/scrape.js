@@ -42,23 +42,25 @@ var org_1 = require("./entities/org");
 var octo = new octokit_1.Octokit({});
 function update() {
     return __awaiter(this, void 0, void 0, function () {
-        var orgRepository, listOrgs;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var orgRepository, _a, listOrgs, length, count;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     orgRepository = connenction_1.AppDataSource.getRepository(org_1.Org);
-                    return [4 /*yield*/, orgRepository.findOneBy({
-                            uName: 'arshi45'
-                        })
-                        // let count:number = length
-                    ];
+                    return [4 /*yield*/, orgRepository.findAndCount({ select: ['uName'] })];
                 case 1:
-                    listOrgs = _a.sent();
-                    // let count:number = length
+                    _a = _b.sent(), listOrgs = _a[0], length = _a[1];
+                    count = length;
                     console.log(listOrgs);
                     return [2 /*return*/];
             }
         });
     });
 }
-update();
+connenction_1.AppDataSource.initialize()
+    .then(function () {
+    console.log("Running");
+    update();
+})["catch"](function (err) {
+    console.log(err);
+});

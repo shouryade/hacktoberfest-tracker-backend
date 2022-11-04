@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     username: "root",
     password: "password",
     database: "Root",
-    synchronize: true,
+    synchronize: false,
     entities: [Org, Repo]
 });
 

@@ -31,7 +31,7 @@ app.get("/signUp/:link",async (req:express.Request,res:express.Response) => {
 
     const newId = await orgData.findOneBy({uName:orgLink});
     res.send({
-        "newId":newId,
+        "newId":newId.id,
         "message":"New user generated. Kindly keep the id safe for next login"
     });
 
