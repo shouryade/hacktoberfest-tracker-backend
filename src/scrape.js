@@ -42,7 +42,7 @@ var org_1 = require("./entities/org");
 var octo = new octokit_1.Octokit({});
 function update() {
     return __awaiter(this, void 0, void 0, function () {
-        var orgRepository, _a, listOrgs, length, count;
+        var orgRepository, _a, listOrgs, length, count, data, newData;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -50,8 +50,25 @@ function update() {
                     return [4 /*yield*/, orgRepository.findAndCount({ select: ['uName'] })];
                 case 1:
                     _a = _b.sent(), listOrgs = _a[0], length = _a[1];
+                    console.log({ listOrgs: listOrgs, size: length });
                     count = length;
-                    console.log(listOrgs);
+                    _b.label = 2;
+                case 2:
+                    if (!count--) return [3 /*break*/, 5];
+                    return [4 /*yield*/, octo.request("GET /users/{owner}/repos", {
+                            owner: listOrgs[count].uName
+                        })];
+                case 3:
+                    data = _b.sent();
+                    return [4 /*yield*/, orgRepository.findOneBy({
+                            uName: listOrgs[count].uName
+                        })];
+                case 4:
+                    newData = _b.sent();
+                    console.log(data.data);
+                    return [3 /*break*/, 2];
+                case 5:
+                    setTimeout(update, 5000);
                     return [2 /*return*/];
             }
         });
