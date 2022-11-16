@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,23 +51,84 @@ var octokit_1 = require("octokit");
 var express = require("express");
 var app = express();
 var octo = new octokit_1.Octokit();
+function getCounts(org, repoName) {
+    return __awaiter(this, void 0, void 0, function () {
+        var members, issueList, commits;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
+                        owner: org,
+                        repo: repoName
+                    })];
+                case 1:
+                    members = _a.sent();
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/issues", {
+                            owner: org,
+                            repo: repoName
+                        })];
+                case 2:
+                    issueList = _a.sent();
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/commits", {
+                            owner: org,
+                            repo: repoName
+                        })];
+                case 3:
+                    commits = _a.sent();
+                    return [2 /*return*/, {
+                            commits: commits.data.length,
+                            members: members.data.length,
+                            issues: issueList.data.length
+                        }];
+            }
+        });
+    });
+}
 function getNames(username) {
     return __awaiter(this, void 0, void 0, function () {
-        var repos, actualRepo, i;
+        var repos, actualRepo, commits, issues, contributors, repoCount, i, counts;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    actualRepo = [];
+                    actualRepo = {
+                        commits: 0,
+                        issues: 0,
+                        contributors: 0,
+                        repoCount: 0,
+                        repos: []
+                    };
                     return [4 /*yield*/, octo.request("GET /orgs/{owner}/repos", {
                             owner: username
                         })];
                 case 1:
                     repos = _a.sent();
-                    for (i = 0; i < repos.data.length; i++) {
-                        if (repos.data[i].topics.includes("hacktoberfest2022") || repos.data[i].topics.includes("hacktoberfest")) {
-                            actualRepo.push(repos.data[i].name);
-                        }
-                    }
+                    commits = 0;
+                    issues = 0;
+                    contributors = 0;
+                    repoCount = 0;
+                    i = 0;
+                    _a.label = 2;
+                case 2:
+                    if (!(i < repos.data.length)) return [3 /*break*/, 5];
+                    if (!(repos.data[i].topics.includes("hacktoberfest2022") || repos.data[i].topics.includes("hacktoberfest"))) return [3 /*break*/, 4];
+                    repoCount += 1;
+                    return [4 /*yield*/, getCounts(username, repos.data[i].name)];
+                case 3:
+                    counts = _a.sent();
+                    issues += counts.issues;
+                    contributors += counts.members;
+                    commits += counts.commits;
+                    actualRepo.repos.push({
+                        name: repos.data[i].name,
+                        desc: repos.data[i].description,
+                        topics: repos.data[i].topics,
+                        link: repos.data[i].html_url
+                    });
+                    _a.label = 4;
+                case 4:
+                    i++;
+                    return [3 /*break*/, 2];
+                case 5:
+                    actualRepo = __assign(__assign({}, actualRepo), { commits: commits, contributors: contributors, repoCount: repoCount, issues: issues });
                     console.log(actualRepo);
                     return [2 /*return*/, actualRepo];
             }
@@ -89,12 +161,11 @@ app.get("/:org/:repo", function (req, res) { return __awaiter(void 0, void 0, vo
             case 3:
                 commits = _a.sent();
                 send = {
-                    orgName: org,
                     data: {
                         name: name,
                         issues: issueList.data,
                         members: members.data,
-                        totalCommits: commits.data,
+                        totalCommits: commits.data.length,
                         totalIssues: issueList.data.length
                     }
                 };
@@ -114,7 +185,7 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
                 names = _a.sent();
                 res.send({
                     org: username,
-                    name: names
+                    orgData: names
                 });
                 return [2 /*return*/];
         }

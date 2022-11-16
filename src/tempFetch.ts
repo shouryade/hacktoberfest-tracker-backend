@@ -62,6 +62,8 @@ async function getNames(username:string){
         owner:username
     });
 
+
+
     let commits:number = 0;
     let issues:number = 0;
     let contributors:number = 0;
@@ -94,8 +96,6 @@ async function getNames(username:string){
         repoCount:repoCount,
         issues:issues
     }
-
-    console.log(actualRepo);
 
     return actualRepo;
 }
@@ -140,7 +140,7 @@ app.get("/:org/:repo",async (req,res) => {
 app.get("/:username",async (req,res) => {
    
     let username = req.params.username;
-    let names:{
+    let data:{
         commits:number,
         issues:number,
         contributors:number,
@@ -151,10 +151,27 @@ app.get("/:username",async (req,res) => {
             topics:string[],
             link:string}[]
     } = await getNames(username);
+    let org:{
+        orgName:string,
+        orgDesc:string
+    } 
+    let orgTemp = await octo.request("GET /orgs/{owner}",{
+        owner:username
+    });
+
+    org = {
+        orgName:orgTemp.data.name,
+        orgDesc:orgTemp.data.description
+    }
+
+    console.log({
+        org:org,
+        orgData:data
+    })
 
     res.send({
-        org:username,
-        orgData:names
+        org:org,
+        orgData:data
     });
 });
 
