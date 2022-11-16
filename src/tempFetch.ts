@@ -4,6 +4,13 @@ import * as express from "express";
 const app = express();
 const octo = new Octokit();
 
+type repo = {
+    "name":string,
+    "totalCommits":any,
+    "totalIssues":number,
+    "members":any,
+    "issues":any
+}
 
 async function getNames(username:string){
     let repos;
@@ -19,93 +26,59 @@ async function getNames(username:string){
             actualRepo.push(repos.data[i].name);
         }
     }
-
-    // repoNames.forEach(async (repo) => {
-    //     let topics = await octo.request("GET /repos/{owner}/{repo}/topics",{
-    //         owner:"developer-student-club-thapar",
-    //         repo:repo
-    //     });
-
-    //     console.log(topics);
-
-    //     if(topics.data.names.includes("hacktoberfest2022") || topics.data.names.includes("hacktoberfest")){
-    //         actualRepo.push(repo);
-    //     }
-    // });
-
     console.log(actualRepo);
 
     return actualRepo;
 }
 
-type repo = {
-    "name":string,
-    "totalCommits":any,
-    "totalIssues":number,
-    "members":any,
-    "issues":any
-}
+app.get("/:org/:repo",async (req,res) => {
 
-async function getRepoData(names:string[],username:string){
-    
+    const org = req.params.org;
+    const name = req.params.repo;
 
     let send:{
         orgName:string,
-        data:repo[]
-    } = {orgName:"",data:[]};
-    
-    for(var i=0;i<names.length;i++){
-        let repoData:repo;
-        
-        let issueList = await octo.request("GET /repos/{owner}/{repo}/issues",{
-            owner:username,
-            repo:names[i]
-        });
+        data:repo
+    }
 
-        let members = await octo.request("GET /repos/{owner}/{repo}/contributors",{
-            owner:username,
-            repo:names[i]
-        });
+    let issueList = await octo.request("GET /repos/{owner}/{repo}/issues",{
+        owner:org,
+        repo:name
+    });
 
-        let commits = await octo.request("GET /repos/{owner}/{repo}/commits",{
-            owner:username,
-            repo:names[i]
-        });
+    let members = await octo.request("GET /repos/{owner}/{repo}/contributors",{
+        owner:org,
+        repo:name
+    });
 
-        repoData = {
-            name:names[i],
+    let commits = await octo.request("GET /repos/{owner}/{repo}/commits",{
+        owner:org,
+        repo:name
+    });
+
+    send = {
+        orgName:org,
+        data:{
+            name:name,
             issues:issueList.data,
             members:members.data,
             totalCommits:commits.data,
             totalIssues:issueList.data.length
-        }
-
-        // console.log(repoData);
-        
-        send.data.push(repoData)
+        }  
     }
 
-    console.log(send);
-    
-    let orgName = await octo.request("GET /orgs/{owner}",{
-        owner:username
-    });
-
-    send.orgName = orgName.data.name
-
-    return send;
-    
-}
+    res.send(send)
+});
 
 app.get("/:username",async (req,res) => {
+   
     let username = req.params.username;
     let names:string[] = await getNames(username);
-    let data:{
-        orgName:string,
-        data:repo[]
-    } = await getRepoData(names,username);
 
-    res.send(data);
+    res.send({
+        org:username,
+        name:names
+    });
 });
 
 app.post("/verify/:username",async (req,res) => {
