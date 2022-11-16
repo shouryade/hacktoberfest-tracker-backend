@@ -52,36 +52,41 @@ async function getRepoData(names:string[],username:string){
     let send:{
         orgName:string,
         data:repo[]
-    };
-    names.forEach(async (name) => {
+    } = {orgName:"",data:[]};
+    
+    for(var i=0;i<names.length;i++){
         let repoData:repo;
         
         let issueList = await octo.request("GET /repos/{owner}/{repo}/issues",{
             owner:username,
-            repo:name
+            repo:names[i]
         });
 
         let members = await octo.request("GET /repos/{owner}/{repo}/contributors",{
             owner:username,
-            repo:name
+            repo:names[i]
         });
 
         let commits = await octo.request("GET /repos/{owner}/{repo}/commits",{
             owner:username,
-            repo:name
+            repo:names[i]
         });
 
         repoData = {
-            name:name,
+            name:names[i],
             issues:issueList.data,
             members:members.data,
             totalCommits:commits.data,
             totalIssues:issueList.data.length
         }
 
-        send.data.push(repoData);
-    });
+        // console.log(repoData);
+        
+        send.data.push(repoData)
+    }
 
+    console.log(send);
+    
     let orgName = await octo.request("GET /orgs/{owner}",{
         owner:username
     });
@@ -103,7 +108,28 @@ app.get("/:username",async (req,res) => {
     res.send(data);
 });
 
-app.listen(3000,() => {
+app.post("/verify/:username",async (req,res) => {
+    let username = req.params.username;
+    let verify = await octo.request("GET /orgs/{owner}",{
+        owner:username
+    });
+
+    if(verify.data!=null){
+        console.log("Request Made");
+        
+        res.send({
+            "verified":true
+        })
+    }
+        
+    else{
+        res.send({
+            "verified":false
+        })
+    };
+})
+
+app.listen(3060,() => {
     console.log("Running on 3000");
     
 })

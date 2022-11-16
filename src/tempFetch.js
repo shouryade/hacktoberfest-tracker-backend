@@ -75,44 +75,57 @@ function getNames(username) {
 }
 function getRepoData(names, username) {
     return __awaiter(this, void 0, void 0, function () {
-        var data;
-        var _this = this;
+        var send, i, repoData, issueList, members, commits, orgName;
         return __generator(this, function (_a) {
-            names.forEach(function (name) { return __awaiter(_this, void 0, void 0, function () {
-                var repoData, issueList, members, commits;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/issues", {
-                                owner: username,
-                                repo: name
-                            })];
-                        case 1:
-                            issueList = _a.sent();
-                            return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
-                                    owner: username,
-                                    repo: name
-                                })];
-                        case 2:
-                            members = _a.sent();
-                            return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/commits", {
-                                    owner: username,
-                                    repo: name
-                                })];
-                        case 3:
-                            commits = _a.sent();
-                            repoData = {
-                                name: name,
-                                issues: issueList.data,
-                                members: members.data,
-                                totalCommits: commits.data,
-                                totalIssues: issueList.data.length
-                            };
-                            data.push(repoData);
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-            return [2 /*return*/, data];
+            switch (_a.label) {
+                case 0:
+                    send = { orgName: "", data: [] };
+                    i = 0;
+                    _a.label = 1;
+                case 1:
+                    if (!(i < names.length)) return [3 /*break*/, 6];
+                    repoData = void 0;
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/issues", {
+                            owner: username,
+                            repo: names[i]
+                        })];
+                case 2:
+                    issueList = _a.sent();
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
+                            owner: username,
+                            repo: names[i]
+                        })];
+                case 3:
+                    members = _a.sent();
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/commits", {
+                            owner: username,
+                            repo: names[i]
+                        })];
+                case 4:
+                    commits = _a.sent();
+                    repoData = {
+                        name: names[i],
+                        issues: issueList.data,
+                        members: members.data,
+                        totalCommits: commits.data,
+                        totalIssues: issueList.data.length
+                    };
+                    // console.log(repoData);
+                    send.data.push(repoData);
+                    _a.label = 5;
+                case 5:
+                    i++;
+                    return [3 /*break*/, 1];
+                case 6:
+                    console.log(send);
+                    return [4 /*yield*/, octo.request("GET /orgs/{owner}", {
+                            owner: username
+                        })];
+                case 7:
+                    orgName = _a.sent();
+                    send.orgName = orgName.data.name;
+                    return [2 /*return*/, send];
+            }
         });
     });
 }
@@ -128,10 +141,38 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
                 return [4 /*yield*/, getRepoData(names, username)];
             case 2:
                 data = _a.sent();
+                res.send(data);
                 return [2 /*return*/];
         }
     });
 }); });
-app.listen(3000, function () {
+app.post("/verify/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var username, verify;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                username = req.params.username;
+                return [4 /*yield*/, octo.request("GET /orgs/{owner}", {
+                        owner: username
+                    })];
+            case 1:
+                verify = _a.sent();
+                if (verify.data != null) {
+                    console.log("Request Made");
+                    res.send({
+                        "verified": true
+                    });
+                }
+                else {
+                    res.send({
+                        "verified": false
+                    });
+                }
+                ;
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.listen(3060, function () {
     console.log("Running on 3000");
 });
