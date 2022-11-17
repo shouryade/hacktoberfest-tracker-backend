@@ -50,7 +50,9 @@ exports.__esModule = true;
 var octokit_1 = require("octokit");
 var express = require("express");
 var app = express();
-var octo = new octokit_1.Octokit();
+var octo = new octokit_1.Octokit({
+    auth: "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"
+});
 function getCounts(org, repoName) {
     return __awaiter(this, void 0, void 0, function () {
         var members, issueList, commits;
@@ -129,7 +131,6 @@ function getNames(username) {
                     return [3 /*break*/, 2];
                 case 5:
                     actualRepo = __assign(__assign({}, actualRepo), { commits: commits, contributors: contributors, repoCount: repoCount, issues: issues });
-                    console.log(actualRepo);
                     return [2 /*return*/, actualRepo];
             }
         });
@@ -175,17 +176,30 @@ app.get("/:org/:repo", function (req, res) { return __awaiter(void 0, void 0, vo
     });
 }); });
 app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, names;
+    var username, data, org, orgTemp;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 username = req.params.username;
                 return [4 /*yield*/, getNames(username)];
             case 1:
-                names = _a.sent();
+                data = _a.sent();
+                return [4 /*yield*/, octo.request("GET /orgs/{owner}", {
+                        owner: username
+                    })];
+            case 2:
+                orgTemp = _a.sent();
+                org = {
+                    orgName: orgTemp.data.name,
+                    orgDesc: orgTemp.data.description
+                };
+                console.log({
+                    org: org,
+                    orgData: data
+                });
                 res.send({
-                    org: username,
-                    orgData: names
+                    org: org,
+                    orgData: data
                 });
                 return [2 /*return*/];
         }

@@ -3,7 +3,9 @@ import * as express from "express";
 import { count } from "console";
 
 const app = express();
-const octo = new Octokit();
+const octo = new Octokit({
+    auth:"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"
+});
 
 type repo = {
     "name":string,
