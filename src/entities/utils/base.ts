@@ -1,40 +1,49 @@
-import { BaseEntity,Column,Entity, PrimaryColumn } from "typeorm"
+import { BaseEntity,Column,Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity('base')
 export class Base{
     
-    @PrimaryColumn({
-        type:"numeric"
-    })
+    @PrimaryGeneratedColumn()
     id:number
 
     @Column({
-        type:"numeric"
+        type:"varchar"
+    })
+    uName:string
+
+    @Column({
+        type:"numeric",
+        default:0
     })
     totalContributions:number
 
     @Column({
-        type:"numeric"
+        type:"numeric",
+        default:0
     })
     totalCommits:number
 
     @Column({
-        type:"numeric"
+        type:"numeric",
+        default:0
     })
     totalIssues:number
 
     @Column({
-        type:"json"
+        type:"json",
+        default:null
     })
     contributorList:object
 
     @Column({
-        type:"json"
+        type:"json",
+        default:null
     })
     issueList:object
 
     @Column({
-        type:"json"
+        type:"json",
+        default:null
     })
     contributionList:object
 }

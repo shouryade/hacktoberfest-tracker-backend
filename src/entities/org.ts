@@ -1,17 +1,22 @@
-import { Entity,Column } from "typeorm";
+import { Entity,Column, OneToMany } from "typeorm";
+import { Repo } from "./repo";
 import { Base} from "./utils/base";
 
 @Entity('org') 
 export class Org extends Base{
 
     @Column({
-        type:"numeric"
+        type:"numeric",
+        default:0
     })
     totalRepos:number
 
     @Column({
-        type:"json"
-    }
-    )
+        type:"json",
+        default:null
+    })
     totalRepoList:object
+
+    @OneToMany(() => Repo,(repo) => repo.org)
+    repos: Repo[]
 }

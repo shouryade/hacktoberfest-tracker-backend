@@ -4,7 +4,7 @@
   "description": "Hacktober Analyzer",
   "main": "fetch.js",
   "scripts": {
-    "start":"node dist/fetch.js",
+    "start": "node dist/fetch.js",
     "dev": "nodemon ./src/fetch.js",
     "build": "tsc -p ."
   },
@@ -28,6 +28,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mysql": "^2.18.1",
     "octokit": "^2.0.9",
