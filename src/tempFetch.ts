@@ -1,9 +1,11 @@
+require('dotenv').config()
 import { Octokit } from "octokit";
 import * as express from "express";
-import { count } from "console";
 
 const app = express();
-const octo = new Octokit();
+const octo = new Octokit({
+    auth: process.env.TOKEN
+});
 
 type repo = {
     "name":string,
