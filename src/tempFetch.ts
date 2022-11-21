@@ -17,11 +17,21 @@ type contributor = {
 }
 
 type repo = {
-    "name":string,
-    "totalCommits":any,
-    "totalIssues":number,
-    "members":any,
-    "issues":any
+    totalCommits:number,
+    totalIssues:number,
+    totalContributors:number;
+    members:{
+        name:string,
+        photo:string,
+        login:string,
+        contributions:number
+    }[],
+    issues:{
+        number:number,
+        title:string,
+        user:string,
+        body:string
+    }[]
 }
 
 async function getCounts(org:string,repoName:string){
@@ -62,7 +72,7 @@ async function getCounts(org:string,repoName:string){
 
 }
 
-async function getNames(username:string){
+async function getDashData(username:string){
     let repos;
     let actualRepo:{
         commits:number,
@@ -127,13 +137,14 @@ async function getNames(username:string){
     return actualRepo;
 }
 
-app.get("/:org/:repo",async (req,res) => {
+async function getRepoData(org,name){
 
-    const org = req.params.org;
-    const name = req.params.repo;
-
-    let send:{
-        data:repo
+    let send:repo = {
+        totalCommits:0,
+        issues:[],
+        members:[],
+        totalContributors:0,
+        totalIssues:0
     }
 
     let issueList = await octo.request("GET /repos/{owner}/{repo}/issues",{
@@ -141,10 +152,35 @@ app.get("/:org/:repo",async (req,res) => {
         repo:name
     });
 
+    for(var i=0;i<issueList.data.length;i++){
+        let issue = {
+          number:issueList.data[i].number,
+          title:issueList.data[i].title,
+          user:issueList.data[i].user.login,
+          body:issueList.data[i].body 
+        }
+        
+        send.issues.push(issue)
+    }
+
     let members = await octo.request("GET /repos/{owner}/{repo}/contributors",{
         owner:org,
         repo:name
     });
+
+    for(var i=0;i<members.data.length;i++){
+        
+        let actualName = await octo.request(members.data[i].url)
+
+        let member = {
+            name:actualName.data.name,
+            photo:members.data[i].avatar_url,
+            login:members.data[i].login,
+            contributions:members.data[i].contributions
+        }
+
+        send.members.push(member)
+    }
 
     let commits = await octo.request("GET /repos/{owner}/{repo}/commits",{
         owner:org,
@@ -152,16 +188,25 @@ app.get("/:org/:repo",async (req,res) => {
     });
 
     send = {
-        data:{
-            name:name,
-            issues:issueList.data,
-            members:members.data,
-            totalCommits:commits.data.length,
-            totalIssues:issueList.data.length
-        }  
+        ...send,
+        totalCommits:commits.data.length,
+        totalIssues:issueList.data.length,
+        totalContributors:members.data.length
     }
 
-    res.send(send)
+    console.log(send)
+
+    return send
+}
+
+app.get("/:org/:repo",async (req,res) => {
+
+    const org = req.params.org;
+    const name = req.params.repo;
+
+    let repoData:repo = await getRepoData(org,name);
+
+    res.send(repoData)
 });
 
 app.get("/:username",async (req,res) => {
@@ -184,7 +229,7 @@ app.get("/:username",async (req,res) => {
                 topics:string[],
                 link:string
             }[]
-        } = await getNames(username);
+        } = await getDashData(username);
         let org:{
             orgName:string,
             orgDesc:string,

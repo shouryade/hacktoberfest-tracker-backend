@@ -100,7 +100,7 @@ function getCounts(org, repoName) {
         });
     });
 }
-function getNames(username) {
+function getDashData(username) {
     return __awaiter(this, void 0, void 0, function () {
         var repos, actualRepo, commits, issues, contributors, repoCount, i, counts;
         return __generator(this, function (_a) {
@@ -152,41 +152,82 @@ function getNames(username) {
         });
     });
 }
+function getRepoData(org, name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var send, issueList, i, issue, members, i, actualName, member, commits;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    send = {
+                        totalCommits: 0,
+                        issues: [],
+                        members: [],
+                        totalContributors: 0,
+                        totalIssues: 0
+                    };
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/issues", {
+                            owner: org,
+                            repo: name
+                        })];
+                case 1:
+                    issueList = _a.sent();
+                    for (i = 0; i < issueList.data.length; i++) {
+                        issue = {
+                            number: issueList.data[i].number,
+                            title: issueList.data[i].title,
+                            user: issueList.data[i].user.login,
+                            body: issueList.data[i].body
+                        };
+                        send.issues.push(issue);
+                    }
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
+                            owner: org,
+                            repo: name
+                        })];
+                case 2:
+                    members = _a.sent();
+                    i = 0;
+                    _a.label = 3;
+                case 3:
+                    if (!(i < members.data.length)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, octo.request(members.data[i].url)];
+                case 4:
+                    actualName = _a.sent();
+                    member = {
+                        name: actualName.data.name,
+                        photo: members.data[i].avatar_url,
+                        login: members.data[i].login,
+                        contributions: members.data[i].contributions
+                    };
+                    send.members.push(member);
+                    _a.label = 5;
+                case 5:
+                    i++;
+                    return [3 /*break*/, 3];
+                case 6: return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/commits", {
+                        owner: org,
+                        repo: name
+                    })];
+                case 7:
+                    commits = _a.sent();
+                    send = __assign(__assign({}, send), { totalCommits: commits.data.length, totalIssues: issueList.data.length, totalContributors: members.data.length });
+                    console.log(send);
+                    return [2 /*return*/, send];
+            }
+        });
+    });
+}
 app.get("/:org/:repo", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var org, name, send, issueList, members, commits;
+    var org, name, repoData;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 org = req.params.org;
                 name = req.params.repo;
-                return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/issues", {
-                        owner: org,
-                        repo: name
-                    })];
+                return [4 /*yield*/, getRepoData(org, name)];
             case 1:
-                issueList = _a.sent();
-                return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
-                        owner: org,
-                        repo: name
-                    })];
-            case 2:
-                members = _a.sent();
-                return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/commits", {
-                        owner: org,
-                        repo: name
-                    })];
-            case 3:
-                commits = _a.sent();
-                send = {
-                    data: {
-                        name: name,
-                        issues: issueList.data,
-                        members: members.data,
-                        totalCommits: commits.data.length,
-                        totalIssues: issueList.data.length
-                    }
-                };
-                res.send(send);
+                repoData = _a.sent();
+                res.send(repoData);
                 return [2 /*return*/];
         }
     });
@@ -198,9 +239,10 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
             case 0:
                 username = req.params.username;
                 if (!(username === "undefined")) return [3 /*break*/, 1];
+                console.log("Undefined Request");
                 res.send({ response: "false request" });
                 return [3 /*break*/, 4];
-            case 1: return [4 /*yield*/, getNames(username)];
+            case 1: return [4 /*yield*/, getDashData(username)];
             case 2:
                 data = _a.sent();
                 org = void 0;
