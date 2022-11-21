@@ -169,7 +169,7 @@ app.get("/:username",async (req,res) => {
     let username = req.params.username;
 
     if(username === "undefined"){
-        res.send({reponse:"false request"});
+        res.send({response:"false request"});
     }
     else{
         let data:{
