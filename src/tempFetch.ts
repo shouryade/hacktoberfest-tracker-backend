@@ -171,43 +171,44 @@ app.get("/:username",async (req,res) => {
     if(username === "undefined"){
         res.send({reponse:"false request"});
     }
-
-    let data:{
-        commits:number,
-        issues:number,
-        contributors:number,
-        repoCount:number,
-        repos:{
-            name:string,
-            desc:string,
-            topics:string[],
-            link:string
-        }[]
-    } = await getNames(username);
-    let org:{
-        orgName:string,
-        orgDesc:string,
-        orgLink:string
-    } 
-    let orgTemp = await octo.request("GET /orgs/{owner}",{
-        owner:username
-    });
-
-    org = {
-        orgName:orgTemp.data.name,
-        orgDesc:orgTemp.data.description,
-        orgLink:orgTemp.data.html_url
+    else{
+        let data:{
+            commits:number,
+            issues:number,
+            contributors:number,
+            repoCount:number,
+            repos:{
+                name:string,
+                desc:string,
+                topics:string[],
+                link:string
+            }[]
+        } = await getNames(username);
+        let org:{
+            orgName:string,
+            orgDesc:string,
+            orgLink:string
+        } 
+        let orgTemp = await octo.request("GET /orgs/{owner}",{
+            owner:username
+        });
+    
+        org = {
+            orgName:orgTemp.data.name,
+            orgDesc:orgTemp.data.description,
+            orgLink:orgTemp.data.html_url
+        }
+    
+        console.log({
+            org:org,
+            orgData:data
+        })
+    
+        res.send({
+            org:org,
+            orgData:data
+        });
     }
-
-    console.log({
-        org:org,
-        orgData:data
-    })
-
-    res.send({
-        org:org,
-        orgData:data
-    });
 });
 
 app.post("/verify/:username",async (req,res) => {
