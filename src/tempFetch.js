@@ -197,16 +197,17 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
         switch (_a.label) {
             case 0:
                 username = req.params.username;
-                if (username === "undefined") {
-                    res.send("false request");
-                }
-                return [4 /*yield*/, getNames(username)];
-            case 1:
+                if (!(username === "undefined")) return [3 /*break*/, 1];
+                res.send({ reponse: "false request" });
+                return [3 /*break*/, 4];
+            case 1: return [4 /*yield*/, getNames(username)];
+            case 2:
                 data = _a.sent();
+                org = void 0;
                 return [4 /*yield*/, octo.request("GET /orgs/{owner}", {
                         owner: username
                     })];
-            case 2:
+            case 3:
                 orgTemp = _a.sent();
                 org = {
                     orgName: orgTemp.data.name,
@@ -221,7 +222,8 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
                     org: org,
                     orgData: data
                 });
-                return [2 /*return*/];
+                _a.label = 4;
+            case 4: return [2 /*return*/];
         }
     });
 }); });
