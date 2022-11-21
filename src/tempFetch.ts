@@ -1,11 +1,14 @@
 require('dotenv').config()
 import { Octokit } from "octokit";
 import * as express from "express";
+import setHeaders from "./middleware";
 
 const app = express();
 const octo = new Octokit({
     auth: process.env.TOKEN
 });
+
+app.use(setHeaders);
 
 type repo = {
     "name":string,
