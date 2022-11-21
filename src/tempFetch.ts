@@ -165,8 +165,13 @@ app.get("/:org/:repo",async (req,res) => {
 });
 
 app.get("/:username",async (req,res) => {
-   
+    
     let username = req.params.username;
+
+    if(username === "undefined"){
+        res.send("false request");
+    }
+
     let data:{
         commits:number,
         issues:number,
@@ -176,7 +181,8 @@ app.get("/:username",async (req,res) => {
             name:string,
             desc:string,
             topics:string[],
-            link:string}[]
+            link:string
+        }[]
     } = await getNames(username);
     let org:{
         orgName:string,

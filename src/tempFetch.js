@@ -197,6 +197,9 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
         switch (_a.label) {
             case 0:
                 username = req.params.username;
+                if (username === "undefined") {
+                    res.send("false request");
+                }
                 return [4 /*yield*/, getNames(username)];
             case 1:
                 data = _a.sent();
