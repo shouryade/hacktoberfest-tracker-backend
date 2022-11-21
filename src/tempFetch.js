@@ -50,10 +50,12 @@ exports.__esModule = true;
 require('dotenv').config();
 var octokit_1 = require("octokit");
 var express = require("express");
+var middleware_1 = require("./middleware");
 var app = express();
 var octo = new octokit_1.Octokit({
     auth: process.env.TOKEN
 });
+app.use(middleware_1["default"]);
 function getCounts(org, repoName) {
     return __awaiter(this, void 0, void 0, function () {
         var members, issueList, commits;
@@ -207,17 +209,26 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
     });
 }); });
 app.post("/verify/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, verify;
+    var username, verify, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 username = req.params.username;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, octo.request("GET /orgs/{owner}", {
                         owner: username
                     })];
-            case 1:
+            case 2:
                 verify = _a.sent();
-                if (verify.data != null) {
+                return [3 /*break*/, 4];
+            case 3:
+                err_1 = _a.sent();
+                verify = "Not Found";
+                return [3 /*break*/, 4];
+            case 4:
+                if (verify != "Not Found") {
                     console.log("Request Made");
                     res.send({
                         "verified": true

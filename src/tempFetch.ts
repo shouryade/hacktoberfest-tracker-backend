@@ -1,11 +1,14 @@
 require('dotenv').config()
 import { Octokit } from "octokit";
 import * as express from "express";
+import setHeaders from "./middleware";
 
 const app = express();
 const octo = new Octokit({
     auth: process.env.TOKEN
 });
+
+app.use(setHeaders);
 
 type repo = {
     "name":string,
@@ -179,11 +182,18 @@ app.get("/:username",async (req,res) => {
 
 app.post("/verify/:username",async (req,res) => {
     let username = req.params.username;
-    let verify = await octo.request("GET /orgs/{owner}",{
-        owner:username
-    });
+    let verify;
+    try{
+        verify = await octo.request("GET /orgs/{owner}",{
+            owner:username
+        });
+    }
+    catch(err){
+        verify = "Not Found"
+    }
+    
 
-    if(verify.data!=null){
+    if(verify != "Not Found"){
         console.log("Request Made");
         
         res.send({
