@@ -10,6 +10,12 @@ const octo = new Octokit({
 
 app.use(setHeaders);
 
+type contributor = {
+    name:string,
+    photo:string,
+    contributions:number
+}
+
 type repo = {
     "name":string,
     "totalCommits":any,
@@ -20,10 +26,22 @@ type repo = {
 
 async function getCounts(org:string,repoName:string){
 
+    let top:contributor = {
+        name:' ',
+        photo:' ',
+        contributions:0
+    };
+
     let members = await octo.request("GET /repos/{owner}/{repo}/contributors",{
         owner:org,
         repo:repoName
     });
+
+    top = {
+        name:members.data[0].login,
+        photo:members.data[0].avatar_url,
+        contributions:members.data[0].contributions
+    }
 
     let issueList = await octo.request("GET /repos/{owner}/{repo}/issues",{
         owner:org,
@@ -38,7 +56,8 @@ async function getCounts(org:string,repoName:string){
     return {
         commits:commits.data.length,
         members:members.data.length,
-        issues:issueList.data.length
+        issues:issueList.data.length,
+        topContributor:top
     }
 
 }
@@ -54,7 +73,9 @@ async function getNames(username:string){
             name:string,
             desc:string,
             topics:string[],
-            link:string}[]
+            link:string,
+            topContributor:contributor
+        }[]
     } = {
         commits:0,
         issues:0,
@@ -89,7 +110,8 @@ async function getNames(username:string){
                 name:repos.data[i].name,
                 desc:repos.data[i].description,
                 topics:repos.data[i].topics,
-                link:repos.data[i].html_url
+                link:repos.data[i].html_url,
+                topContributor:counts.topContributor
             });
         }
     }
@@ -158,7 +180,8 @@ app.get("/:username",async (req,res) => {
     } = await getNames(username);
     let org:{
         orgName:string,
-        orgDesc:string
+        orgDesc:string,
+        orgLink:string
     } 
     let orgTemp = await octo.request("GET /orgs/{owner}",{
         owner:username
@@ -166,7 +189,8 @@ app.get("/:username",async (req,res) => {
 
     org = {
         orgName:orgTemp.data.name,
-        orgDesc:orgTemp.data.description
+        orgDesc:orgTemp.data.description,
+        orgLink:orgTemp.data.html_url
     }
 
     console.log({

@@ -58,15 +58,26 @@ var octo = new octokit_1.Octokit({
 app.use(middleware_1["default"]);
 function getCounts(org, repoName) {
     return __awaiter(this, void 0, void 0, function () {
-        var members, issueList, commits;
+        var top, members, issueList, commits;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
-                        owner: org,
-                        repo: repoName
-                    })];
+                case 0:
+                    top = {
+                        name: ' ',
+                        photo: ' ',
+                        contributions: 0
+                    };
+                    return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/contributors", {
+                            owner: org,
+                            repo: repoName
+                        })];
                 case 1:
                     members = _a.sent();
+                    top = {
+                        name: members.data[0].login,
+                        photo: members.data[0].avatar_url,
+                        contributions: members.data[0].contributions
+                    };
                     return [4 /*yield*/, octo.request("GET /repos/{owner}/{repo}/issues", {
                             owner: org,
                             repo: repoName
@@ -82,7 +93,8 @@ function getCounts(org, repoName) {
                     return [2 /*return*/, {
                             commits: commits.data.length,
                             members: members.data.length,
-                            issues: issueList.data.length
+                            issues: issueList.data.length,
+                            topContributor: top
                         }];
             }
         });
@@ -126,7 +138,8 @@ function getNames(username) {
                         name: repos.data[i].name,
                         desc: repos.data[i].description,
                         topics: repos.data[i].topics,
-                        link: repos.data[i].html_url
+                        link: repos.data[i].html_url,
+                        topContributor: counts.topContributor
                     });
                     _a.label = 4;
                 case 4:
@@ -194,7 +207,8 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
                 orgTemp = _a.sent();
                 org = {
                     orgName: orgTemp.data.name,
-                    orgDesc: orgTemp.data.description
+                    orgDesc: orgTemp.data.description,
+                    orgLink: orgTemp.data.html_url
                 };
                 console.log({
                     org: org,
