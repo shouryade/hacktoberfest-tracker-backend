@@ -169,6 +169,7 @@ app.get("/:username",async (req,res) => {
     let username = req.params.username;
 
     if(username === "undefined"){
+        console.log("Undefined Request");
         res.send({response:"false request"});
     }
     else{
