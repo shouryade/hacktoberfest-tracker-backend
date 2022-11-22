@@ -254,7 +254,8 @@ app.get("/:username", function (req, res) { return __awaiter(void 0, void 0, voi
                 org = {
                     orgName: orgTemp.data.name,
                     orgDesc: orgTemp.data.description,
-                    orgLink: orgTemp.data.html_url
+                    orgLink: orgTemp.data.html_url,
+                    photo: orgTemp.data.avatar_url
                 };
                 console.log({
                     org: org,
