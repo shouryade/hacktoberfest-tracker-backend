@@ -233,7 +233,8 @@ app.get("/:username",async (req,res) => {
         let org:{
             orgName:string,
             orgDesc:string,
-            orgLink:string
+            orgLink:string,
+            photo:string
         } 
         let orgTemp = await octo.request("GET /orgs/{owner}",{
             owner:username
@@ -242,7 +243,8 @@ app.get("/:username",async (req,res) => {
         org = {
             orgName:orgTemp.data.name,
             orgDesc:orgTemp.data.description,
-            orgLink:orgTemp.data.html_url
+            orgLink:orgTemp.data.html_url,
+            photo:orgTemp.data.avatar_url
         }
     
         console.log({
