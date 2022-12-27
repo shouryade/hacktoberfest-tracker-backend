@@ -2,6 +2,7 @@ require("dotenv").config();
 import { Octokit } from "octokit";
 import * as express from "express";
 import setHeaders from "./middleware";
+import { GraphqlResponseError } from "@octokit/graphql";
 
 const app = express();
 const octo = new Octokit({
@@ -134,7 +135,7 @@ async function getDashData(username: string) {
   return actualRepo;
 }
 
-async function getRepoData(org, name) {
+async function getRepoData(org: string, name: string) {
   let send: repo = {
     totalCommits: 0,
     issues: [],
@@ -189,67 +190,67 @@ async function getRepoData(org, name) {
     totalContributors: members.data.length,
   };
 
-  console.log(send);
+  //   console.log(send);
 
   return send;
 }
 
-app.get("/:org/:repo", async (req, res) => {
-  const org = req.params.org;
-  const name = req.params.repo;
+// app.get("/:org/:repo", async (req, res) => {
+//   const org = req.params.org;
+//   const name = req.params.repo;
 
-  let repoData: repo = await getRepoData(org, name);
+//   let repoData: repo = await getRepoData(org, name);
 
-  res.send(repoData);
-});
+//   res.send(repoData);
+// });
 
-app.get("/:username", async (req, res) => {
-  let username = req.params.username;
+// app.get("/:username", async (req, res) => {
+//   let username = req.params.username;
 
-  if (username === "undefined") {
-    console.log("Undefined Request");
-    res.send({ response: "false request" });
-  } else {
-    let data: {
-      commits: number;
-      issues: number;
-      contributors: number;
-      repoCount: number;
-      repos: {
-        name: string;
-        desc: string;
-        topics: string[];
-        link: string;
-      }[];
-    } = await getDashData(username);
-    let org: {
-      orgName: string;
-      orgDesc: string;
-      orgLink: string;
-      photo: string;
-    };
-    let orgTemp = await octo.request("GET /orgs/{owner}", {
-      owner: username,
-    });
+//   if (username === "undefined") {
+//     console.log("Undefined Request");
+//     res.send({ response: "false request" });
+//   } else {
+//     let data: {
+//       commits: number;
+//       issues: number;
+//       contributors: number;
+//       repoCount: number;
+//       repos: {
+//         name: string;
+//         desc: string;
+//         topics: string[];
+//         link: string;
+//       }[];
+//     } = await getDashData(username);
+//     let org: {
+//       orgName: string;
+//       orgDesc: string;
+//       orgLink: string;
+//       photo: string;
+//     };
+//     let orgTemp = await octo.request("GET /orgs/{owner}", {
+//       owner: username,
+//     });
 
-    org = {
-      orgName: orgTemp.data.name,
-      orgDesc: orgTemp.data.description,
-      orgLink: orgTemp.data.html_url,
-      photo: orgTemp.data.avatar_url,
-    };
+//     org = {
+//       orgName: orgTemp.data.name,
+//       orgDesc: orgTemp.data.description,
+//       orgLink: orgTemp.data.html_url,
+//       photo: orgTemp.data.avatar_url,
+//     };
 
-    console.log({
-      org: org,
-      orgData: data,
-    });
+//     console.log({
+//       org: org,
+//       orgData: data,
+//     });
 
-    res.send({
-      org: org,
-      orgData: data,
-    });
-  }
-});
+//     res.send({
+//       org: org,
+//       orgData: data,
+//     });
+//   }
+// });
 
 app.post("/verify/:username", async (req, res) => {
   let username = req.params.username;
@@ -273,6 +274,59 @@ app.post("/verify/:username", async (req, res) => {
       verified: false,
     });
   }
+});
+
+app.get("/:org/:repo", async (req, res) => {
+  let organisation = req.params.org;
+  let name = req.params.repo;
+
+  console.log(organisation);
+  let answer;
+  try {
+    answer = await octo.graphql(
+      `query getRepoData($organisation: String!, $name: String!) {
+        repository(owner: $organisation, name: $name) {
+          ... on Repository {
+            defaultBranchRef {
+              name
+              target {
+                ... on Commit {
+                  history {
+                    totalCount
+                  }
+                }
+              }
+            }
+          }
+          issues(
+            last: 100
+            filterBy: {labels: ["Hacktoberfest-Accepted"], states: [OPEN]}
+          ) {
+            edges {
+              node {
+                number
+                title
+                url
+              }
+            }
+          }
+        }
+      }
+      `,
+      {
+        organisation: organisation,
+        name: name,
+      }
+    );
+  } catch (error) {
+    if (error instanceof GraphqlResponseError) {
+      res.json("Error!" + error.message);
+    } else {
+      res.json("Server error!, please retry!");
+    }
+  }
+  console.log(answer.repository.defaultBranchRef.target.history.totalCount);
+  res.json(answer);
 });
 
 app.listen(3060, () => {
