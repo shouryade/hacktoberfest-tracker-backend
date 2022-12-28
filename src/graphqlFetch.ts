@@ -39,105 +39,23 @@ type repo = {
   }[];
 };
 
-async function getCounts(org: string, repoName: string) {
-  let top: contributor = {
-    name: " ",
-    photo: " ",
-    contributions: 0,
-  };
-
-  let members = await octo.request("GET /repos/{owner}/{repo}/contributors", {
-    owner: org,
-    repo: repoName,
-  });
-
-  top = {
-    name: members.data[0].login,
-    photo: members.data[0].avatar_url,
-    contributions: members.data[0].contributions,
-  };
-
-  let issueList = await octo.request("GET /repos/{owner}/{repo}/issues", {
-    owner: org,
-    repo: repoName,
-  });
-
-  let commits = await octo.request("GET /repos/{owner}/{repo}/commits", {
-    owner: org,
-    repo: repoName,
-  });
-
-  return {
-    commits: commits.data.length,
-    members: members.data.length,
-    issues: issueList.data.length,
-    topContributor: top,
-  };
-}
-
-async function getDashData(username: string) {
-  let repos;
-  let actualRepo: {
-    commits: number;
-    issues: number;
-    contributors: number;
-    repoCount: number;
-    repos: {
-      name: string;
-      desc: string;
-      topics: string[];
-      link: string;
-      topContributor: contributor;
-    }[];
-  } = {
-    commits: 0,
-    issues: 0,
-    contributors: 0,
-    repoCount: 0,
-    repos: [],
-  };
-
-  repos = await octo.request("GET /orgs/{owner}/repos", {
-    owner: username,
-  });
-
-  let commits: number = 0;
-  let issues: number = 0;
-  let contributors: number = 0;
-  let repoCount: number = 0;
-
-  for (var i = 0; i < repos.data.length; i++) {
-    if (
-      repos.data[i].topics.includes("hacktoberfest2022") ||
-      repos.data[i].topics.includes("hacktoberfest")
-    ) {
-      repoCount += 1;
-      let counts = await getCounts(username, repos.data[i].name);
-
-      issues += counts.issues;
-      contributors += counts.members;
-      commits += counts.commits;
-
-      actualRepo.repos.push({
-        name: repos.data[i].name,
-        desc: repos.data[i].description,
-        topics: repos.data[i].topics,
-        link: repos.data[i].html_url,
-        topContributor: counts.topContributor,
-      });
-    }
-  }
-
-  actualRepo = {
-    ...actualRepo,
-    commits: commits,
-    contributors: contributors,
-    repoCount: repoCount,
-    issues: issues,
-  };
-
-  return actualRepo;
-}
+type orgData = {
+  name: string;
+  avatarUrl: string;
+  description: string;
+  url: string;
+  hfestRepos: number;
+  repos: {
+    name: string;
+    url: string;
+    description: string;
+    topics: string[];
+    defBranch: string;
+    totalCommits: number;
+    openIssues: number;
+    prOpen: number;
+  }[];
+};
 
 async function getRepoData(org: string, name: string) {
   let send: repo = {
@@ -234,6 +152,102 @@ app.get("/:org/:repo", async (req, res) => {
   let reponse: string | repo = await getRepoData(organisation, name);
 
   res.json(reponse);
+});
+
+async function getDashData(organisation: string) {
+  let querystring = "org:" + organisation + " topic:hacktoberfest";
+  let data: GraphQlQueryResponseData;
+  try {
+    data = await octo.graphql(
+      `query getDashData($organisation: String!, $querystring: String!) {
+  search(last: 100, type: REPOSITORY, query: $querystring) {
+    repos: nodes {
+      ... on Repository {
+        name
+        url
+        description
+        repositoryTopics(first: 100) {
+          nodes {
+            topic {
+              name
+            }
+          }
+        }
+        defaultBranchRef {
+          name
+          target {
+            ... on Commit {
+              history {
+                totalCount
+              }
+            }
+          }
+        }
+        openIssues: issues(states: OPEN) {
+          totalCount
+        }
+        prOpen: pullRequests(states: OPEN) {
+          totalCount
+        }
+      }
+    }
+  }
+  organization(login: $organisation) {
+    name
+    avatarUrl
+    description
+    url
+  }
+}
+      `,
+      {
+        organisation: organisation,
+        querystring: querystring,
+      }
+    );
+  } catch (error) {
+    if (error instanceof GraphqlResponseError) {
+      return error.message;
+    } else {
+      return "Server Error!";
+    }
+  }
+  let response: orgData = {
+    name: data.organization.name,
+    avatarUrl: data.organization.avatarUrl,
+    description: data.organization.description,
+    url: data.organization.url,
+    hfestRepos: data.search.repos.length,
+    repos: [],
+  };
+
+  for (let node of data.search.repos) {
+    let repository = {
+      name: node.name,
+      url: node.url,
+      description: node.description,
+      topics: node.repositoryTopics.nodes.map((nodes) => nodes.topic.name),
+      defBranch: node.defaultBranchRef.name,
+      totalCommits: node.defaultBranchRef.target.history.totalCount,
+      openIssues: node.openIssues.totalCount,
+      prOpen: node.prOpen.totalCount,
+    };
+    response.repos.push(repository);
+  }
+
+  return response;
+}
+
+app.get("/:username", async (req, res) => {
+  let username = req.params.username;
+
+  if (username === "undefined") {
+    console.log("Undefined Request");
+    res.send({ response: "False request" });
+  } else {
+    let dashData: string | orgData = await getDashData(username);
+    res.json(dashData);
+  }
 });
 
 app.post("/verify/:username", async (req, res) => {
