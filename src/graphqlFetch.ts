@@ -139,66 +139,6 @@ async function getDashData(username: string) {
   return actualRepo;
 }
 
-async function getRepoData1(org: string, name: string) {
-  let send: repo = {
-    totalCommits: 0,
-    issues: [],
-    members: [],
-    totalContributors: 0,
-    totalIssues: 0,
-  };
-
-  let issueList = await octo.request("GET /repos/{owner}/{repo}/issues", {
-    owner: org,
-    repo: name,
-  });
-
-  for (var i = 0; i < issueList.data.length; i++) {
-    let issue = {
-      number: issueList.data[i].number,
-      title: issueList.data[i].title,
-      user: issueList.data[i].user.login,
-      body: issueList.data[i].body,
-    };
-
-    send.issues.push(issue);
-  }
-
-  let members = await octo.request("GET /repos/{owner}/{repo}/contributors", {
-    owner: org,
-    repo: name,
-  });
-
-  for (var i = 0; i < members.data.length; i++) {
-    let actualName = await octo.request(members.data[i].url);
-
-    let member = {
-      name: actualName.data.name,
-      photo: members.data[i].avatar_url,
-      login: members.data[i].login,
-      contributions: members.data[i].contributions,
-    };
-
-    // send.members.push(member);
-  }
-
-  let commits = await octo.request("GET /repos/{owner}/{repo}/commits", {
-    owner: org,
-    repo: name,
-  });
-
-  send = {
-    ...send,
-    totalCommits: commits.data.length,
-    totalIssues: issueList.data.length,
-    totalContributors: members.data.length,
-  };
-
-  //   console.log(send);
-
-  return send;
-}
-
 async function getRepoData(org: string, name: string) {
   let send: repo = {
     totalCommits: 0,
