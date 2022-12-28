@@ -21,11 +21,10 @@ type repo = {
   totalIssues: number;
   totalContributors: number;
   members: {
+    name: string;
+    photo: string;
     login: string;
-    avatar_url: string;
     contributions: number;
-    id: number;
-    html_url: string;
   }[];
   issues: {
     number: number;
@@ -144,23 +143,49 @@ async function getRepoData(org, name) {
     totalIssues: 0,
   };
 
+  let issueList = await octo.request("GET /repos/{owner}/{repo}/issues", {
+    owner: org,
+    repo: name,
+  });
+
+  for (var i = 0; i < issueList.data.length; i++) {
+    let issue = {
+      number: issueList.data[i].number,
+      title: issueList.data[i].title,
+      user: issueList.data[i].user.login,
+      body: issueList.data[i].body,
+    };
+
+    send.issues.push(issue);
+  }
+
   let members = await octo.request("GET /repos/{owner}/{repo}/contributors", {
     owner: org,
     repo: name,
   });
 
-  send.members = members.data.map(
-    ({ login, avatar_url, id, contributions, html_url }) => ({
-      login,
-      avatar_url,
-      id,
-      contributions,
-      html_url,
-    })
-  );
+  for (var i = 0; i < members.data.length; i++) {
+    let actualName = await octo.request(members.data[i].url);
+
+    let member = {
+      name: actualName.data.name,
+      photo: members.data[i].avatar_url,
+      login: members.data[i].login,
+      contributions: members.data[i].contributions,
+    };
+
+    send.members.push(member);
+  }
+
+  let commits = await octo.request("GET /repos/{owner}/{repo}/commits", {
+    owner: org,
+    repo: name,
+  });
 
   send = {
     ...send,
+    totalCommits: commits.data.length,
+    totalIssues: issueList.data.length,
     totalContributors: members.data.length,
   };
 
@@ -251,5 +276,5 @@ app.post("/verify/:username", async (req, res) => {
 });
 
 app.listen(3060, () => {
-  console.log("Running on 3060");
+  console.log("Running on 3000");
 });
