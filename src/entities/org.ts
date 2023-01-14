@@ -6,17 +6,19 @@ import { Base} from "./utils/base";
 export class Org extends Base{
 
     @Column({
+        type:"varchar"
+    })
+    avatar_url:string
+
+    @Column({
         type:"numeric",
         default:0
     })
     totalRepos:number
 
-    @Column({
-        type:"json",
-        default:null
-    })
-    totalRepoList:object
-
-    @OneToMany(() => Repo,(repo) => repo.org)
+    @OneToMany(
+        () => Repo,
+        (repo) => repo.org
+    )
     repos: Repo[]
 }

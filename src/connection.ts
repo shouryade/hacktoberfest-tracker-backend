@@ -2,6 +2,7 @@ import { DataSource } from "typeorm"
 import { Org } from "./entities/org"
 import { Repo } from "./entities/repo"
 import "reflect-metadata"
+import { Contribution } from "./entities/contribution";
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -10,8 +11,8 @@ export const AppDataSource = new DataSource({
     username: "root",
     password: "password",
     database: "Root",
-    synchronize: false,
-    entities: [Org, Repo]
+    synchronize: true,
+    entities: [Org, Repo,Contribution]
 });
 
 AppDataSource.initialize()

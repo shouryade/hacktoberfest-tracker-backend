@@ -9,13 +9,18 @@ export class Base{
     @Column({
         type:"varchar"
     })
+    name:string
+
+    @Column({
+        type:"varchar"
+    })
     uName:string
 
     @Column({
         type:"numeric",
         default:0
     })
-    totalContributions:number
+    totalPrOpen:number
 
     @Column({
         type:"numeric",
@@ -30,20 +35,13 @@ export class Base{
     totalIssues:number
 
     @Column({
-        type:"json",
-        default:null
+        type:"varchar"
     })
-    contributorList:object
+    url:string
 
     @Column({
-        type:"json",
-        default:null
+        type:"longtext"
     })
-    issueList:object
+    desc:string
 
-    @Column({
-        type:"json",
-        default:null
-    })
-    contributionList:object
 }
