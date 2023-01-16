@@ -5,6 +5,7 @@ import { orgData } from "./types";
 import * as http from "http"
 import setHeaders from "../middleware";
 import { Repo } from "../entities/repo";
+import { Contribution } from "../entities/contribution";
 
 const router = express.Router();
 express().use(setHeaders);
@@ -78,12 +79,34 @@ const addRepos = async (data,orgId) => {
         })
         
         await repoRepo.save(newRepo).catch(err => {
-            let response = "Error:"+err;
-            return response;
+            console.log("Error:"+err);
         });
+
+        addContributor(newRepo,repo.contributors)
+
     })
 
     return "Repos added successfully";
+}
+
+const addContributor = async (repo:Repo,repoContributors:Contribution[]) => {
+    
+    const client = AppDataSource.getRepository(Contribution)
+
+    repoContributors.forEach(async (contributor) => {
+    
+        const newContributor = client.create({
+            githubId:contributor.githubId,
+            name:contributor.name,
+            contributions:contributor.contributions,
+            picLink:contributor.picLink,
+            repo:repo
+        });
+
+        await client.save(newContributor)
+    });
+
+    return;
 }
 
 router.get("/addC/:username",async (req,res) => {

@@ -2,12 +2,14 @@ import * as express from "express";
 import setHeaders from "./middleware";
 import { getOrgData } from "./routes/fetchOrgData";
 import { addOrg } from "./routes/addOrg";
+import { updateOrg } from "./routes/updateOrg";
 const app = express();
 
 
 app.use(setHeaders);
 app.use(getOrgData);
 app.use(addOrg);
+app.use(updateOrg);
 
 
 app.listen(3060,() => {
