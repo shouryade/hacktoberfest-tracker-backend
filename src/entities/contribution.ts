@@ -27,6 +27,11 @@ export class Contribution{
     })
     contributions:number
 
+    @Column({
+        type:"varchar"
+    })
+    profile_link:string
+
     @ManyToOne(
         () => Repo,
         repo => repo.contributions

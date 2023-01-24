@@ -1,7 +1,7 @@
 import * as express from "express"
 import { AppDataSource } from "../connection";
 import { Org } from "../entities/org";
-import { orgData } from "./types";
+import { contributors, orgData } from "./types";
 import * as http from "http"
 import setHeaders from "../middleware";
 import { Repo } from "../entities/repo";
@@ -89,17 +89,18 @@ const addRepos = async (data,orgId) => {
     return "Repos added successfully";
 }
 
-const addContributor = async (repo:Repo,repoContributors:Contribution[]) => {
+const addContributor = async (repo:Repo,repoContributors:contributors[]) => {
     
     const client = AppDataSource.getRepository(Contribution)
 
     repoContributors.forEach(async (contributor) => {
     
         const newContributor = client.create({
-            githubId:contributor.githubId,
+            githubId:contributor.login,
             name:contributor.name,
             contributions:contributor.contributions,
-            picLink:contributor.picLink,
+            picLink:contributor.avatar_url,
+            profile_link:contributor.html_url,
             repo:repo
         });
 

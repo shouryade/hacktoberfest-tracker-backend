@@ -1,15 +1,16 @@
 type contributors = {
+  name:string,
   login: string;
   html_url: string;
   avatar_url: string;
   contributions: number;
 };
 
-type contributor = {
-  name: string;
-  photo: string;
-  contributions: number;
-};
+// type contributor = {
+//   name: string;
+//   photo: string;
+//   contributions: number;
+// };
 
 type repo = {
   totalCommits: number;
@@ -48,4 +49,4 @@ type orgData = {
   }[];
 };
 
-export { contributor, repo, orgData };
+export {contributors,repo, orgData };

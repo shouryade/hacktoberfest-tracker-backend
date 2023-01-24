@@ -4,7 +4,7 @@ import { Org } from '../entities/org';
 import { Repo } from '../entities/repo';
 import { Contribution } from '../entities/contribution';
 import * as http from 'http'
-import { orgData } from './types';
+import { contributors, orgData } from './types';
 
 const router = express.Router();
 
@@ -52,7 +52,7 @@ const updateOrg = async () => {
         data.repos.forEach(async (repo) => {
             
             var result = orgR.repos.find((element) => {
-                return element.uName = repo.uName
+                return element.uName = repo.name
             })
 
             //udpate Repo data - to do
@@ -72,17 +72,18 @@ const updateOrg = async () => {
                 )
                 .getOne()
     
-                repo.contributors.forEach(async (cont:Contribution) => {
+                repo.contributors.forEach(async (cont:contributors) => {
 
                     var result1 = repoData.contributions.find((ele) => {
-                        return ele.githubId = cont.githubId;
+                        return ele.githubId = cont.login;
                     })
     
                     if(result1) {
                         //update old contribution
                         result1.contributions = cont.contributions;
                         result1.name = cont.name;
-                        result1.picLink = cont.picLink;
+                        result1.picLink = cont.avatar_url;
+                        result1.profile_link = cont.html_url
 
                         await contRepo.save(result1);
                     }
@@ -91,8 +92,9 @@ const updateOrg = async () => {
                         const newContribution = contRepo.create({
                             contributions:cont.contributions,
                             name:cont.name,
-                            picLink:cont.picLink,
-                            githubId:cont.githubId,
+                            picLink:cont.avatar_url,
+                            githubId:cont.login,
+                            profile_link:cont.html_url,
                             repo:repoData
                         });
 
