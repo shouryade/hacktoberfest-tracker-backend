@@ -81,7 +81,6 @@ const updateOrg = async () => {
                     if(result1) {
                         //update old contribution
                         result1.contributions = cont.contributions;
-                        result1.name = cont.name;
                         result1.picLink = cont.avatar_url;
                         result1.profile_link = cont.html_url
 
@@ -91,7 +90,6 @@ const updateOrg = async () => {
                         //create new contribution
                         const newContribution = contRepo.create({
                             contributions:cont.contributions,
-                            name:cont.name,
                             picLink:cont.avatar_url,
                             githubId:cont.login,
                             profile_link:cont.html_url,

@@ -15,11 +15,6 @@ export class Contribution{
     @Column({
         type:"varchar"
     })
-    name:string;
-
-    @Column({
-        type:"varchar"
-    })
     picLink:string;
 
     @Column({

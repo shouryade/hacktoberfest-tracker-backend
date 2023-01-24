@@ -90,8 +90,9 @@ async function getDashData(organisation: string) {
       owner: organisation,
       repo: node.name,
     });
+    
     let contributors = contri.data.map(
-      ({ name,login, html_url, avatar_url, contributions }) => ({
+      ({ name, login, html_url, avatar_url, contributions }) => ({
         name,
         login,
         html_url,

@@ -24,11 +24,6 @@ var Contribution = /** @class */ (function () {
         (0, typeorm_1.Column)({
             type: "varchar"
         })
-    ], Contribution.prototype, "name");
-    __decorate([
-        (0, typeorm_1.Column)({
-            type: "varchar"
-        })
     ], Contribution.prototype, "picLink");
     __decorate([
         (0, typeorm_1.Column)({

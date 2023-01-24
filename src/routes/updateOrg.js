@@ -106,7 +106,6 @@ var updateOrg = function () { return __awaiter(void 0, void 0, void 0, function 
                                                     if (!result1) return [3 /*break*/, 2];
                                                     //update old contribution
                                                     result1.contributions = cont.contributions;
-                                                    result1.name = cont.name;
                                                     result1.picLink = cont.avatar_url;
                                                     result1.profile_link = cont.html_url;
                                                     return [4 /*yield*/, contRepo.save(result1)];
@@ -116,7 +115,6 @@ var updateOrg = function () { return __awaiter(void 0, void 0, void 0, function 
                                                 case 2:
                                                     newContribution = contRepo.create({
                                                         contributions: cont.contributions,
-                                                        name: cont.name,
                                                         picLink: cont.avatar_url,
                                                         githubId: cont.login,
                                                         profile_link: cont.html_url,

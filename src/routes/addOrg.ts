@@ -97,7 +97,6 @@ const addContributor = async (repo:Repo,repoContributors:contributors[]) => {
     
         const newContributor = client.create({
             githubId:contributor.login,
-            name:contributor.name,
             contributions:contributor.contributions,
             picLink:contributor.avatar_url,
             profile_link:contributor.html_url,

@@ -143,7 +143,6 @@ var addContributor = function (repo, repoContributors) { return __awaiter(void 0
                     case 0:
                         newContributor = client.create({
                             githubId: contributor.login,
-                            name: contributor.name,
                             contributions: contributor.contributions,
                             picLink: contributor.avatar_url,
                             profile_link: contributor.html_url,

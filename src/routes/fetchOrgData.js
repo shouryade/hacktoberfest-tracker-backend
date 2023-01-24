@@ -96,6 +96,7 @@ function getDashData(organisation) {
                         })];
                 case 6:
                     contri = _b.sent();
+                    console.log(contri);
                     contributors = contri.data.map(function (_a) {
                         var name = _a.name, login = _a.login, html_url = _a.html_url, avatar_url = _a.avatar_url, contributions = _a.contributions;
                         return ({
