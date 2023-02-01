@@ -28,6 +28,11 @@ export class Issues {
     })
     user:string
 
+    @Column({
+        type:"varchar"
+    })
+    url:string
+
     @ManyToOne(
         () => Repo,
         repo => repo.issues

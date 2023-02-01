@@ -7,9 +7,10 @@ type contributors = {
 
 type issue = {
   title: string;
-  desc: string;
+  body: string;
   number: number;
-  user: string;
+  author: string;
+  url:string;
 };
 
 // type contributor = {

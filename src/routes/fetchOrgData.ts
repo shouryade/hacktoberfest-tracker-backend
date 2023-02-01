@@ -57,6 +57,7 @@ async function getDashData(organisation: string) {
                   author {
                     login
                   }
+                  body
                 }
               }
               prOpen: pullRequests(states: OPEN) {
@@ -111,11 +112,12 @@ async function getDashData(organisation: string) {
       })
     );
     let issueList = node.openIssues.nodes.map(
-      ({ url, number, title, author }) => ({
+      ({ url, number, title, author,body }) => ({
         number,
         title,
         url,
         author,
+        body
       })
     );
     let repository = {

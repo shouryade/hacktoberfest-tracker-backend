@@ -2,7 +2,7 @@ require("dotenv").config();
 import { Octokit } from "octokit";
 import * as express from "express";
 import setHeaders from "../middleware";
-import {repo} from "./types";
+// import {repo} from "./types";
 import {
   GraphqlResponseError,
   GraphQlQueryResponseData,
@@ -17,7 +17,7 @@ const octo = new Octokit({
 app.use(setHeaders);
 
 async function getRepoData(org: string, name: string) {
-    let send: repo = {
+    let send = {
       totalCommits: 0,
       issues: [],
       members: [],
@@ -108,7 +108,7 @@ async function getRepoData(org: string, name: string) {
   router.get("/:org/:repo", async (req, res) => {
     let organisation = req.params.org;
     let name = req.params.repo;
-    let reponse: string | repo = await getRepoData(organisation, name);
+    let reponse= await getRepoData(organisation, name);
   
     res.json(reponse);
   });

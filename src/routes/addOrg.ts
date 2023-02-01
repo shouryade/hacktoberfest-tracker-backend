@@ -118,7 +118,10 @@ const addIssue = (repo:Repo,repoIssues:issue[]) => {
         const newIssue = issueRepo.create({
             issuesNo:issue.number,
             title:issue.title,
-            desc:issue.desc
+            desc:issue.body,
+            user:issue.author,
+            url:issue.url,
+            repo:repo
         });
 
         await issueRepo.save(newIssue);

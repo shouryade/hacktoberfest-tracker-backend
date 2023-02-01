@@ -6,6 +6,7 @@ import { Contribution } from '../entities/contribution';
 import * as http from 'http'
 import { contributors, issue, orgData } from './types';
 import { Issues } from '../entities/issues';
+import { url } from 'inspector';
 
 const router = express.Router();
 
@@ -84,16 +85,17 @@ const updateOrg = async () => {
                 )
                 .getOne();
 
-                repo.openIssues.forEach(async (issue:issue) => {
+                repo.issueList.forEach(async (issue:issue) => {
                     var result1 = repoIssues.issues.find((ele) => {
                         return ele.issuesNo = issue.number
                     });
                     const issueRepo = AppDataSource.getRepository(Issues);
 
                     if(result1){
-                        result1.desc = issue.desc;
+                        result1.desc = issue.body;
                         result1.title = issue.title;
-                        result1.user = issue.user;
+                        result1.user = issue.author;
+                        result1.url = issue.url;
 
                         await issueRepo.save(result1);
                     }
@@ -101,8 +103,10 @@ const updateOrg = async () => {
                         const newIssue = issueRepo.create({
                             issuesNo:issue.number,
                             title:issue.title,
-                            user:issue.user,
-                            desc:issue.desc
+                            user:issue.author,
+                            desc:issue.body,
+                            url:issue.url,
+                            repo:result
                         });
                         await issueRepo.save(newIssue);
                     }
@@ -129,7 +133,7 @@ const updateOrg = async () => {
                             picLink:cont.avatar_url,
                             githubId:cont.login,
                             profile_link:cont.html_url,
-                            repo:repoData
+                            repo:result
                         });
 
                         await contRepo.save(newContribution);
@@ -165,7 +169,7 @@ const updateOrg = async () => {
 
                 await repoRepo.save(newRepo);
 
-                //add contributors for issues
+                //add contributors and issues
             }
         })        
     })  
