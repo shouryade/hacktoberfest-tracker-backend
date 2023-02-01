@@ -14,7 +14,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     username: "root",
     password: "password",
     database: "Root",
-    synchronize: false,
+    synchronize: true,
     entities: [org_1.Org, repo_1.Repo, contribution_1.Contribution, issues_1.Issues]
 });
 exports.AppDataSource.initialize()

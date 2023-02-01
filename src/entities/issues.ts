@@ -1,5 +1,5 @@
 import { CONNREFUSED } from "node:dns";
-import { Column, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Repo } from "./repo";
 
 
@@ -28,7 +28,7 @@ export class Issues {
     })
     user:string
 
-    @ManyToMany(
+    @ManyToOne(
         () => Repo,
         repo => repo.issues
     )

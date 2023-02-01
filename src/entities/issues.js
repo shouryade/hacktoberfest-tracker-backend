@@ -36,7 +36,7 @@ var Issues = /** @class */ (function () {
         })
     ], Issues.prototype, "user");
     __decorate([
-        (0, typeorm_1.ManyToMany)(function () { return repo_1.Repo; }, function (repo) { return repo.issues; }),
+        (0, typeorm_1.ManyToOne)(function () { return repo_1.Repo; }, function (repo) { return repo.issues; }),
         (0, typeorm_1.JoinColumn)({
             name: "repoId"
         })
