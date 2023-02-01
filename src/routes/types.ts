@@ -5,13 +5,12 @@ type contributors = {
   contributions: number;
 };
 
-
 type issue = {
-  title:string;
-  desc:string;
-  number:number;
-  user:string;
-}
+  title: string;
+  desc: string;
+  number: number;
+  user: string;
+};
 
 // type contributor = {
 //   name: string;
@@ -19,19 +18,19 @@ type issue = {
 //   contributions: number;
 // };
 
-// type repo = {
-//   totalCommits: number;
-//   totalIssues: number;
-//   totalContributors: number;
-//   members: {
-//     login: string;
-//     avatar_url: string;
-//     contributions: number;
-//     id: number;
-//     html_url: string;
-//   }[];
-//   issues: issue[];
-// };
+type repo = {
+  totalCommits: number;
+  totalIssues: number;
+  totalContributors: number;
+  members: {
+    login: string;
+    avatar_url: string;
+    contributions: number;
+    id: number;
+    html_url: string;
+  }[];
+  issues: issue[];
+};
 type orgData = {
   name: string;
   avatarUrl: string;
@@ -47,8 +46,9 @@ type orgData = {
     defBranch: string;
     totalCommits: number;
     openIssues: number;
+    issueList: issue[];
     prOpen: number;
   }[];
 };
 
-export {contributors, orgData,issue };
+export { contributors, repo, orgData, issue };

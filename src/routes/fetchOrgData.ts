@@ -22,45 +22,56 @@ async function getDashData(organisation: string) {
   try {
     data = await octo.graphql(
       `query getDashData($organisation: String!, $querystring: String!) {
-    search(last: 100, type: REPOSITORY, query: $querystring) {
-      repos: nodes {
-        ... on Repository {
-          name
-          url
-          description
-          repositoryTopics(first: 100) {
-            nodes {
-              topic {
-                name
-              }
-            }
-          }
-          defaultBranchRef {
-            name
-            target {
-              ... on Commit {
-                history {
-                  totalCount
+        search(last: 100, type: REPOSITORY, query: $querystring) {
+          repos: nodes {
+            ... on Repository {
+              name
+              url
+              description
+              repositoryTopics(first: 100) {
+                nodes {
+                  topic {
+                    name
+                  }
                 }
               }
+              defaultBranchRef {
+                name
+                target {
+                  ... on Commit {
+                    history {
+                      totalCount
+                    }
+                  }
+                }
+              }
+              openIssues: issues(
+                last: 100
+                filterBy: {labels: ["Hacktoberfest-Accepted"], states: [OPEN]}
+              ) {
+                totalCount
+                nodes {
+                  number
+                  title
+                  url
+                  author {
+                    login
+                  }
+                }
+              }
+              prOpen: pullRequests(states: OPEN) {
+                totalCount
+              }
             }
           }
-          openIssues: issues(states: OPEN) {
-            totalCount
-          }
-          prOpen: pullRequests(states: OPEN) {
-            totalCount
-          }
+        }
+        organization(login: $organisation) {
+          name
+          avatarUrl
+          description
+          url
         }
       }
-    }
-    organization(login: $organisation) {
-      name
-      avatarUrl
-      description
-      url
-    }
-  }
         `,
       {
         organisation: organisation,
@@ -75,7 +86,6 @@ async function getDashData(organisation: string) {
       return "Server error";
     }
   }
-
   let response: orgData = {
     name: data.organization.name,
     avatarUrl: data.organization.avatarUrl,
@@ -90,7 +100,7 @@ async function getDashData(organisation: string) {
       owner: organisation,
       repo: node.name,
     });
-    
+
     let contributors = contri.data.map(
       ({ name, login, html_url, avatar_url, contributions }) => ({
         name,
@@ -98,6 +108,14 @@ async function getDashData(organisation: string) {
         html_url,
         avatar_url,
         contributions,
+      })
+    );
+    let issueList = node.openIssues.nodes.map(
+      ({ url, number, title, author }) => ({
+        number,
+        title,
+        url,
+        author,
       })
     );
     let repository = {
@@ -109,8 +127,10 @@ async function getDashData(organisation: string) {
       defBranch: node.defaultBranchRef.name,
       totalCommits: node.defaultBranchRef.target.history.totalCount,
       openIssues: node.openIssues.totalCount,
+      issueList: issueList,
       prOpen: node.prOpen.totalCount,
     };
+
     response.repos.push(repository);
   }
 
