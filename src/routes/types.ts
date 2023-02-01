@@ -19,19 +19,19 @@ type issue = {
 //   contributions: number;
 // };
 
-type repo = {
-  totalCommits: number;
-  totalIssues: number;
-  totalContributors: number;
-  members: {
-    login: string;
-    avatar_url: string;
-    contributions: number;
-    id: number;
-    html_url: string;
-  }[];
-  issues: issue[];
-};
+// type repo = {
+//   totalCommits: number;
+//   totalIssues: number;
+//   totalContributors: number;
+//   members: {
+//     login: string;
+//     avatar_url: string;
+//     contributions: number;
+//     id: number;
+//     html_url: string;
+//   }[];
+//   issues: issue[];
+// };
 type orgData = {
   name: string;
   avatarUrl: string;
@@ -51,4 +51,4 @@ type orgData = {
   }[];
 };
 
-export {contributors,repo, orgData,issue };
+export {contributors, orgData,issue };
