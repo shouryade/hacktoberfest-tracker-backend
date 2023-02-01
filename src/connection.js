@@ -6,6 +6,7 @@ var org_1 = require("./entities/org");
 var repo_1 = require("./entities/repo");
 require("reflect-metadata");
 var contribution_1 = require("./entities/contribution");
+var issues_1 = require("./entities/issues");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -14,7 +15,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     password: "password",
     database: "Root",
     synchronize: false,
-    entities: [org_1.Org, repo_1.Repo, contribution_1.Contribution]
+    entities: [org_1.Org, repo_1.Repo, contribution_1.Contribution, issues_1.Issues]
 });
 exports.AppDataSource.initialize()
     .then(function () {

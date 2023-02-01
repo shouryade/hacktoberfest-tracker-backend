@@ -1,11 +1,13 @@
 import * as express from "express"
 import { AppDataSource } from "../connection";
 import { Org } from "../entities/org";
-import { contributors, orgData } from "./types";
+import { contributors, issue, orgData } from "./types";
 import * as http from "http"
 import setHeaders from "../middleware";
 import { Repo } from "../entities/repo";
 import { Contribution } from "../entities/contribution";
+import { Issues } from "../entities/issues";
+import { describe } from "node:test";
 
 const router = express.Router();
 express().use(setHeaders);
@@ -83,7 +85,7 @@ const addRepos = async (data,orgId) => {
         });
 
         addContributor(newRepo,repo.contributors)
-
+        addIssue(newRepo,repo.issues)
     })
 
     return "Repos added successfully";
@@ -106,6 +108,21 @@ const addContributor = async (repo:Repo,repoContributors:contributors[]) => {
         await client.save(newContributor)
     });
 
+    return;
+}
+
+const addIssue = (repo:Repo,repoIssues:issue[]) => {
+    const issueRepo = AppDataSource.getRepository(Issues);
+
+    repoIssues.forEach(async (issue) => {
+        const newIssue = issueRepo.create({
+            issuesNo:issue.number,
+            title:issue.title,
+            desc:issue.desc
+        });
+
+        await issueRepo.save(newIssue);
+    })
     return;
 }
 

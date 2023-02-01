@@ -44,6 +44,7 @@ var http = require("http");
 var middleware_1 = require("../middleware");
 var repo_1 = require("../entities/repo");
 var contribution_1 = require("../entities/contribution");
+var issues_1 = require("../entities/issues");
 var router = express.Router();
 exports.addOrg = router;
 express().use(middleware_1["default"]);
@@ -124,6 +125,7 @@ var addRepos = function (data, orgId) { return __awaiter(void 0, void 0, void 0,
                             case 1:
                                 _a.sent();
                                 addContributor(newRepo, repo.contributors);
+                                addIssue(newRepo, repo.issues);
                                 return [2 /*return*/];
                         }
                     });
@@ -158,6 +160,27 @@ var addContributor = function (repo, repoContributors) { return __awaiter(void 0
         return [2 /*return*/];
     });
 }); };
+var addIssue = function (repo, repoIssues) {
+    var issueRepo = connection_1.AppDataSource.getRepository(issues_1.Issues);
+    repoIssues.forEach(function (issue) { return __awaiter(void 0, void 0, void 0, function () {
+        var newIssue;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    newIssue = issueRepo.create({
+                        issuesNo: issue.number,
+                        title: issue.title,
+                        desc: issue.desc
+                    });
+                    return [4 /*yield*/, issueRepo.save(newIssue)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    return;
+};
 router.get("/addC/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var orgName, data;
     return __generator(this, function (_a) {

@@ -5,6 +5,14 @@ type contributors = {
   contributions: number;
 };
 
+
+type issue = {
+  title:string;
+  desc:string;
+  number:number;
+  user:string;
+}
+
 // type contributor = {
 //   name: string;
 //   photo: string;
@@ -22,12 +30,7 @@ type repo = {
     id: number;
     html_url: string;
   }[];
-  issues: {
-    number: number;
-    title: string;
-    user: string;
-    body: string;
-  }[];
+  issues: issue[];
 };
 type orgData = {
   name: string;
@@ -48,4 +51,4 @@ type orgData = {
   }[];
 };
 
-export {contributors,repo, orgData };
+export {contributors,repo, orgData,issue };

@@ -24,6 +24,7 @@ exports.__esModule = true;
 exports.Repo = void 0;
 var typeorm_1 = require("typeorm");
 var contribution_1 = require("./contribution");
+var issues_1 = require("./issues");
 var org_1 = require("./org");
 var base_1 = require("./utils/base");
 var Repo = /** @class */ (function (_super) {
@@ -42,6 +43,9 @@ var Repo = /** @class */ (function (_super) {
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return contribution_1.Contribution; }, function (contribution) { return contribution.repo; })
     ], Repo.prototype, "contributions");
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return issues_1.Issues; }, function (issues) { return issues.repo; })
+    ], Repo.prototype, "issues");
     Repo = __decorate([
         (0, typeorm_1.Entity)('repo')
     ], Repo);
