@@ -1,4 +1,3 @@
-import { CONNREFUSED } from "node:dns";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Repo } from "./repo";
 

@@ -9,7 +9,9 @@ type issue = {
   title: string;
   body: string;
   number: number;
-  author: string;
+  author: {
+    login:string
+  };
   url:string;
 };
 

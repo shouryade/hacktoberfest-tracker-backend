@@ -94,7 +94,7 @@ const updateOrg = async () => {
                     if(result1){
                         result1.desc = issue.body;
                         result1.title = issue.title;
-                        result1.user = issue.author;
+                        result1.user = issue.author.login;
                         result1.url = issue.url;
 
                         await issueRepo.save(result1);
@@ -103,7 +103,7 @@ const updateOrg = async () => {
                         const newIssue = issueRepo.create({
                             issuesNo:issue.number,
                             title:issue.title,
-                            user:issue.author,
+                            user:issue.author.login,
                             desc:issue.body,
                             url:issue.url,
                             repo:result

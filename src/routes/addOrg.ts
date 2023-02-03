@@ -85,7 +85,7 @@ const addRepos = async (data,orgId) => {
         });
 
         addContributor(newRepo,repo.contributors)
-        addIssue(newRepo,repo.issues)
+        addIssue(newRepo,repo.issueList)
     })
 
     return "Repos added successfully";
@@ -119,7 +119,7 @@ const addIssue = (repo:Repo,repoIssues:issue[]) => {
             issuesNo:issue.number,
             title:issue.title,
             desc:issue.body,
-            user:issue.author,
+            user:issue.author.login,
             url:issue.url,
             repo:repo
         });
