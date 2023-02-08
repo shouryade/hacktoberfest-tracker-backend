@@ -20,7 +20,7 @@ async function getRepoData(org: string, name: string) {
     let send = {
       totalCommits: 0,
       issues: [],
-      members: [],
+      members: [{}],
       totalContributors: 0,
       totalIssues: 0,
     };

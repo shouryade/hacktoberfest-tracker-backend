@@ -4,9 +4,10 @@ import { getOrgData } from "./routes/fetchOrgData";
 import { addOrg } from "./routes/addOrg";
 import {verifyUser} from "./routes/verifyUser"
 import { updateOrg } from "./routes/updateOrg";
+import {nextFetch} from "./routes/nextFetch"
 const app = express();
 
-app.use(verifyUser)
+app.use(nextFetch);
 app.use(setHeaders);
 app.use(getOrgData);
 app.use(addOrg);

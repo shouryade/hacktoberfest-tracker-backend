@@ -1,32 +1,44 @@
-import express from 'express';
+import * as express from 'express';
 import {AppDataSource} from '../connection'
 import { Org } from '../entities/org';
 import { Repo } from '../entities/repo';
+import { Octokit } from 'octokit';
 
+const octo = new Octokit();
 
 const router = express.Router();
 
-
 router.get('/verifyDB/:orgName',async (req,res) => {
     const orgName = req.params.orgName;
+    let onGithub;
+    try {
+        onGithub = await octo.request("GET /orgs/{owner}", {
+          owner: orgName,
+        });
+      } catch (err) {
+        onGithub = false;
+      }
     
     const orgRepo = AppDataSource.getRepository(Org);
     
     const data = await orgRepo.createQueryBuilder(
         'org'
     )
-    .select('*')
+    .select('org.id')
     .where('org.uName = :uName',{uName:orgName})
     .leftJoinAndSelect(
-        'org.repos.name',
+        'org.repos',
         'repos'
     )
-    .getOne()
+    .getOne();
 
-    if(data){
+    if(data && onGithub){
         res.status(200).json({verifiedDB:true})
     }else{
-        res.status(400).json({verifiedDB:false})
+        if(!onGithub)
+        res.status(400).json({verifiedDB:false,message:"Not on Github"})
+        else
+        res.status(400).json({verifiedDB:false,message:"Not in DB"})
     }
 })
 

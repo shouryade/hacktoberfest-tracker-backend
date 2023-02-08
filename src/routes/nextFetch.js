@@ -36,57 +36,98 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.verifyUser = void 0;
+exports.nextFetch = void 0;
 var express = require("express");
+var connection_1 = require("../connection");
+var org_1 = require("../entities/org");
+var repo_1 = require("../entities/repo");
 var octokit_1 = require("octokit");
-var http = require("http");
-var router = express.Router();
-exports.verifyUser = router;
 var octo = new octokit_1.Octokit();
-router.post("/verify/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, verify, err_1;
+var router = express.Router();
+exports.nextFetch = router;
+router.get('/verifyDB/:orgName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var orgName, onGithub, err_1, orgRepo, data;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                username = req.params.username;
+                orgName = req.params.orgName;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, octo.request("GET /orgs/{owner}", {
-                        owner: username
+                        owner: orgName
                     })];
             case 2:
-                verify = _a.sent();
+                onGithub = _a.sent();
                 return [3 /*break*/, 4];
             case 3:
                 err_1 = _a.sent();
-                verify = "Not Found";
+                onGithub = false;
                 return [3 /*break*/, 4];
             case 4:
-                if (verify != "Not Found") {
-                    console.log("Request Made");
-                    http.get('http://localhost:3060/verifyDB' + username, function (response) {
-                        if (response.statusCode == 400) {
-                            res.send({
-                                verified: false,
-                                message: "Add to DB"
-                            });
-                        }
-                        else {
-                            res.send({
-                                verified: true,
-                                message: "Fetch from DB"
-                            });
-                        }
-                    });
+                orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
+                return [4 /*yield*/, orgRepo.createQueryBuilder('org')
+                        .select('org.id')
+                        .where('org.uName = :uName', { uName: orgName })
+                        .leftJoinAndSelect('org.repos', 'repos')
+                        .getOne()];
+            case 5:
+                data = _a.sent();
+                if (data && onGithub) {
+                    res.status(200).json({ verifiedDB: true });
                 }
                 else {
-                    res.send({
-                        verified: false,
-                        message: "Not found on both Github and DB"
-                    });
+                    if (!onGithub)
+                        res.status(400).json({ verifiedDB: false, message: "Not on Github" });
+                    else
+                        res.status(400).json({ verifiedDB: false, message: "Not in DB" });
                 }
                 return [2 /*return*/];
         }
+    });
+}); });
+router.get('/:orgName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var orgName, orgRepo, data;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                orgName = req.params.orgName;
+                orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
+                return [4 /*yield*/, orgRepo.createQueryBuilder('org')
+                        .select('*')
+                        .where('org.uName = :uName', { uName: orgName })
+                        .leftJoinAndSelect('org.repos.name', 'repos')
+                        .getOne()];
+            case 1:
+                data = _a.sent();
+                res.status(200).json(data);
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.get('/:orgName/:repo', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var repoRepo, orgName, repoName, data;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
+                orgName = req.params.orgName;
+                repoName = req.params.repo;
+                return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
+                        .select('*')
+                        .where("repo.name = :repoName", { repoName: repoName })
+                        .getOne()];
+            case 1:
+                data = _a.sent();
+                res.json(data);
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.get('/:orgName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var orgName;
+    return __generator(this, function (_a) {
+        orgName = req.params.orgName;
+        return [2 /*return*/];
     });
 }); });
