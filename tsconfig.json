@@ -7,7 +7,7 @@
       "experimentalDecorators": true, 
       "emitDecoratorMetadata": true, 
       "moduleResolution": "node",
-      "rootDir": "./src" 
+      "rootDir": "./src" //entry folder
     },
-    "include": ["src"] // which files to compile
+    "include": ["src/index.ts"] // which files to compile
   }

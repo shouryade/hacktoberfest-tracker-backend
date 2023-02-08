@@ -33,8 +33,6 @@ AppDataSource.initialize()
         console.log("Data Source has been initialized!")
     })
     .catch((err) => {
-        console.log(process.env.SQL_HOST);
-        
         console.error("Error during Data Source initialization", err)
     })
 
