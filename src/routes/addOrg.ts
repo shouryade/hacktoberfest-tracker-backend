@@ -129,7 +129,6 @@ const addIssue = (repo:Repo,repoIssues:issue[]) => {
 }
 
 router.get("/addC/:username",async (req,res) => {
-    
     const orgName = req.params.username;
     let data:orgData = {
         name: "",
@@ -149,16 +148,13 @@ router.get("/addC/:username",async (req,res) => {
         result.on('end',async () => {
             let org  = await addOrgToDb(data,orgName);
             addRepos(data.repos,org.id)
+            res.send("Data inserted successfully");
         });
-
     })
     .on('error', (error) => {
         res.send("Error fetching data"+error)
     })
     .end();
-
-    res.send("Data inserted successfully");
-
 })
 
 export {router as addOrg}

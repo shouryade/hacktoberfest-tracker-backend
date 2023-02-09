@@ -46,165 +46,222 @@ var http = require("http");
 var issues_1 = require("../entities/issues");
 var router = express.Router();
 exports.updateOrg = router;
+var mainUpdate = function (data, orgR) { return __awaiter(void 0, void 0, void 0, function () {
+    var orgRepo, repoRepo, contRepo, issueRepo;
+    return __generator(this, function (_a) {
+        orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
+        repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
+        contRepo = connection_1.AppDataSource.getRepository(contribution_1.Contribution);
+        issueRepo = connection_1.AppDataSource.getRepository(issues_1.Issues);
+        data.repos.forEach(function (repo) { return __awaiter(void 0, void 0, void 0, function () {
+            var result, repoData_1, repoIssues_1, newRepo_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        result = orgR.repos.find(function (element) {
+                            return element.name = repo.name;
+                        });
+                        if (!result) return [3 /*break*/, 4];
+                        return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
+                                .select('repo.id')
+                                .where('repo.id = :id', { id: result.id })
+                                .leftJoinAndSelect('repo.contributions', 'contributions')
+                                .getOne()];
+                    case 1:
+                        repoData_1 = _a.sent();
+                        return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
+                                .select('repo.id')
+                                .where('repo.id = :id', { id: result.id })
+                                .leftJoinAndSelect('repo.issues', 'issues')
+                                .getOne()];
+                    case 2:
+                        repoIssues_1 = _a.sent();
+                        repo.issueList.forEach(function (issue) { return __awaiter(void 0, void 0, void 0, function () {
+                            var result1, newIssue;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        result1 = repoIssues_1.issues.find(function (ele) {
+                                            return ele.issuesNo = issue.number;
+                                        });
+                                        if (!result1) return [3 /*break*/, 2];
+                                        result1.desc = issue.body;
+                                        result1.title = issue.title;
+                                        result1.user = issue.author.login;
+                                        result1.url = issue.url;
+                                        return [4 /*yield*/, issueRepo.save(result1)];
+                                    case 1:
+                                        _a.sent();
+                                        return [3 /*break*/, 4];
+                                    case 2:
+                                        newIssue = issueRepo.create({
+                                            issuesNo: issue.number,
+                                            title: issue.title,
+                                            user: issue.author.login,
+                                            desc: issue.body,
+                                            url: issue.url,
+                                            repo: result
+                                        });
+                                        return [4 /*yield*/, issueRepo.save(newIssue)];
+                                    case 3:
+                                        _a.sent();
+                                        _a.label = 4;
+                                    case 4: return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        repo.contributors.forEach(function (cont) { return __awaiter(void 0, void 0, void 0, function () {
+                            var result1, newContribution;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        result1 = repoData_1.contributions.find(function (ele) {
+                                            return ele.githubId = cont.login;
+                                        });
+                                        if (!result1) return [3 /*break*/, 2];
+                                        //update old contribution
+                                        result1.contributions = cont.contributions;
+                                        result1.picLink = cont.avatar_url;
+                                        result1.profile_link = cont.html_url;
+                                        return [4 /*yield*/, contRepo.save(result1)];
+                                    case 1:
+                                        _a.sent();
+                                        return [3 /*break*/, 4];
+                                    case 2:
+                                        newContribution = contRepo.create({
+                                            contributions: cont.contributions,
+                                            picLink: cont.avatar_url,
+                                            githubId: cont.login,
+                                            profile_link: cont.html_url,
+                                            repo: result
+                                        });
+                                        return [4 /*yield*/, contRepo.save(newContribution)];
+                                    case 3:
+                                        _a.sent();
+                                        _a.label = 4;
+                                    case 4: return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        //update it's values
+                        result.totalCommits = repo.totalCommits,
+                            result.desc = repo.description,
+                            result.name = repo.name,
+                            result.topics = repo.topics,
+                            result.totalIssues = repo.openIssues,
+                            result.totalPrOpen = repo.prOpen,
+                            result.url = repo.url;
+                        return [4 /*yield*/, repoRepo.save(result)];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 6];
+                    case 4:
+                        newRepo_1 = repoRepo.create({
+                            uName: "Test",
+                            name: repo.name,
+                            topics: repo.topics,
+                            totalCommits: repo.totalCommits,
+                            totalIssues: repo.openIssues,
+                            totalPrOpen: repo.prOpen,
+                            url: repo.url,
+                            desc: repo.description,
+                            org: orgR
+                        });
+                        return [4 /*yield*/, repoRepo.save(newRepo_1)];
+                    case 5:
+                        _a.sent();
+                        //add contributors and issues
+                        repo.contributors.map(function (contributor) { return __awaiter(void 0, void 0, void 0, function () {
+                            var newContributor;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        newContributor = contRepo.create({
+                                            contributions: contributor.contributions,
+                                            picLink: contributor.avatar_url,
+                                            githubId: contributor.login,
+                                            profile_link: contributor.html_url,
+                                            repo: newRepo_1
+                                        });
+                                        return [4 /*yield*/, contRepo.save(newContributor)];
+                                    case 1:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        repo.issueList.map(function (issue) { return __awaiter(void 0, void 0, void 0, function () {
+                            var newIssue;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        newIssue = issueRepo.create({
+                                            issuesNo: issue.number,
+                                            title: issue.title,
+                                            user: issue.author.login,
+                                            desc: issue.body,
+                                            url: issue.url,
+                                            repo: newRepo_1
+                                        });
+                                        return [4 /*yield*/, issueRepo.save(newIssue)];
+                                    case 1:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        _a.label = 6;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
+    });
+}); };
 var updateOrg = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var orgRepo, repoRepo, contRepo, orgData;
+    var orgRepo, orgData;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
-                repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
-                contRepo = connection_1.AppDataSource.getRepository(contribution_1.Contribution);
                 return [4 /*yield*/, orgRepo.createQueryBuilder('org')
-                        .select('org.id')
-                        .leftJoinAndSelect('org.repo', 'repos')
+                        .leftJoinAndSelect('org.repos', 'repos')
                         .take(10)
                         .getMany()];
             case 1:
                 orgData = _a.sent();
                 orgData.forEach(function (orgR) {
                     var data;
-                    http.request({
-                        hostname: 'localhost',
+                    console.log(orgR.uName);
+                    http.get({
+                        hostname: "localhost",
                         port: 3060,
                         path: '/' + orgR.uName
                     }, function (response) {
                         response.on('data', function (chunk) {
-                            data = chunk;
+                            data = JSON.parse(chunk);
+                            console.log(data);
                         });
-                        response.on('end', function () {
-                            console.log("Request ended");
-                        });
+                        response.on('end', function () { return __awaiter(void 0, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        console.log('calling function');
+                                        return [4 /*yield*/, mainUpdate(data, orgR)];
+                                    case 1:
+                                        _a.sent();
+                                        console.log("Request ended");
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
                     })
                         .on('error', function (err) {
                         console.log("Error fetching data" + err);
                     })
                         .end();
-                    //udpate org data - to do
-                    data.repos.forEach(function (repo) { return __awaiter(void 0, void 0, void 0, function () {
-                        var result, repoData_1, repoIssues_1, newRepo;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    result = orgR.repos.find(function (element) {
-                                        return element.uName = repo.name;
-                                    });
-                                    if (!result) return [3 /*break*/, 4];
-                                    return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
-                                            .select('repo.id')
-                                            .where('repo.id = :id', { id: result.id })
-                                            .leftJoinAndSelect('repo.contributions', 'contributions')
-                                            .getOne()];
-                                case 1:
-                                    repoData_1 = _a.sent();
-                                    return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
-                                            .select('repo.id')
-                                            .where('repo.id = :id', { id: result.id })
-                                            .leftJoinAndSelect('repo.issues', 'issues')
-                                            .getOne()];
-                                case 2:
-                                    repoIssues_1 = _a.sent();
-                                    repo.issueList.forEach(function (issue) { return __awaiter(void 0, void 0, void 0, function () {
-                                        var result1, issueRepo, newIssue;
-                                        return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0:
-                                                    result1 = repoIssues_1.issues.find(function (ele) {
-                                                        return ele.issuesNo = issue.number;
-                                                    });
-                                                    issueRepo = connection_1.AppDataSource.getRepository(issues_1.Issues);
-                                                    if (!result1) return [3 /*break*/, 2];
-                                                    result1.desc = issue.body;
-                                                    result1.title = issue.title;
-                                                    result1.user = issue.author.login;
-                                                    result1.url = issue.url;
-                                                    return [4 /*yield*/, issueRepo.save(result1)];
-                                                case 1:
-                                                    _a.sent();
-                                                    return [3 /*break*/, 4];
-                                                case 2:
-                                                    newIssue = issueRepo.create({
-                                                        issuesNo: issue.number,
-                                                        title: issue.title,
-                                                        user: issue.author.login,
-                                                        desc: issue.body,
-                                                        url: issue.url,
-                                                        repo: result
-                                                    });
-                                                    return [4 /*yield*/, issueRepo.save(newIssue)];
-                                                case 3:
-                                                    _a.sent();
-                                                    _a.label = 4;
-                                                case 4: return [2 /*return*/];
-                                            }
-                                        });
-                                    }); });
-                                    repo.contributors.forEach(function (cont) { return __awaiter(void 0, void 0, void 0, function () {
-                                        var result1, newContribution;
-                                        return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0:
-                                                    result1 = repoData_1.contributions.find(function (ele) {
-                                                        return ele.githubId = cont.login;
-                                                    });
-                                                    if (!result1) return [3 /*break*/, 2];
-                                                    //update old contribution
-                                                    result1.contributions = cont.contributions;
-                                                    result1.picLink = cont.avatar_url;
-                                                    result1.profile_link = cont.html_url;
-                                                    return [4 /*yield*/, contRepo.save(result1)];
-                                                case 1:
-                                                    _a.sent();
-                                                    return [3 /*break*/, 4];
-                                                case 2:
-                                                    newContribution = contRepo.create({
-                                                        contributions: cont.contributions,
-                                                        picLink: cont.avatar_url,
-                                                        githubId: cont.login,
-                                                        profile_link: cont.html_url,
-                                                        repo: result
-                                                    });
-                                                    return [4 /*yield*/, contRepo.save(newContribution)];
-                                                case 3:
-                                                    _a.sent();
-                                                    _a.label = 4;
-                                                case 4: return [2 /*return*/];
-                                            }
-                                        });
-                                    }); });
-                                    //update it's values
-                                    result.totalCommits = repo.totalCommits,
-                                        result.desc = repo.description,
-                                        result.name = repo.name,
-                                        result.topics = repo.topics,
-                                        result.totalIssues = repo.openIssues,
-                                        result.totalPrOpen = repo.prOpen,
-                                        result.url = repo.url;
-                                    return [4 /*yield*/, repoRepo.save(result)];
-                                case 3:
-                                    _a.sent();
-                                    return [3 /*break*/, 6];
-                                case 4:
-                                    newRepo = repoRepo.create({
-                                        uName: "Test",
-                                        name: repo.name,
-                                        topics: repo.topics,
-                                        totalCommits: repo.totalCommits,
-                                        totalIssues: repo.openIssues,
-                                        totalPrOpen: repo.prOpen,
-                                        url: repo.url,
-                                        desc: repo.description,
-                                        org: orgR
-                                    });
-                                    return [4 /*yield*/, repoRepo.save(newRepo)];
-                                case 5:
-                                    _a.sent();
-                                    _a.label = 6;
-                                case 6: return [2 /*return*/];
-                            }
-                        });
-                    }); });
                 });
-                return [2 /*return*/];
+                return [2 /*return*/, orgData];
         }
     });
 }); };
@@ -214,6 +271,7 @@ router.get('/update/org', function (req, res) { return __awaiter(void 0, void 0,
             case 0: return [4 /*yield*/, updateOrg()];
             case 1:
                 _a.sent();
+                res.send({ message: 'OK' });
                 return [2 /*return*/];
         }
     });

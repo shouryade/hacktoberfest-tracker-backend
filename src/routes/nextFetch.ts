@@ -42,7 +42,7 @@ router.get('/verifyDB/:orgName',async (req,res) => {
     }
 })
 
-router.get('/:orgName',async (req,res) => {
+router.get('/next/:orgName',async (req,res) => {
 
     const orgName = req.params.orgName;
     
@@ -51,10 +51,10 @@ router.get('/:orgName',async (req,res) => {
     const data = await orgRepo.createQueryBuilder(
         'org'
     )
-    .select('*')
+    .select('org.id')
     .where('org.uName = :uName',{uName:orgName})
     .leftJoinAndSelect(
-        'org.repos.name',
+        'org.repos',
         'repos'
     )
     .getOne()
@@ -63,26 +63,57 @@ router.get('/:orgName',async (req,res) => {
 
 })
 
-router.get('/:orgName/:repo',async (req,res) => {
+router.get('/next/:orgName/:repo',async (req,res) => {
     const repoRepo = AppDataSource.getRepository(Repo)
 
-    const orgName = req.params.orgName;
     const repoName = req.params.repo;
 
     const data = await repoRepo.createQueryBuilder(
         'repo'
     )
-    .select('*')
+    .select('repo.id')
     .where("repo.name = :repoName",{repoName:repoName})
     .getOne()
 
     res.json(data)
 })
 
-router.get('/:orgName',async (req,res) => {
-    const orgName= req.params.orgName;
+router.get('/contributors/:orgName/:repo/',async (req,res) => {
+    const repoRepo = AppDataSource.getRepository(Repo);
 
+    const repoName = req.params.repo;
 
+    const data = await repoRepo.createQueryBuilder(
+        'repo'
+    )
+    .select('repo.id')
+    .where('repo.name = :repo',{repo:repoName})
+    .leftJoinAndSelect(
+        'repo.contributions',
+        'contributions'
+    )
+    .getOne();
+
+    res.json(data);
+})
+
+router.get('/issues/:orgName/:repo/',async (req,res) => {
+    const repoRepo = AppDataSource.getRepository(Repo);
+
+    const repoName = req.params.repo;
+
+    const data = await repoRepo.createQueryBuilder(
+        'repo'
+    )
+    .select('repo.id')
+    .where('repo.name = :repo',{repo:repoName})
+    .leftJoinAndSelect(
+        'repo.issues',
+        'issues'
+    )
+    .getOne();
+
+    res.json(data);
 })
 
 export {router as nextFetch}

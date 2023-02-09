@@ -208,6 +208,7 @@ router.get("/addC/:username", function (req, res) { return __awaiter(void 0, voi
                         case 1:
                             org = _a.sent();
                             addRepos(data.repos, org.id);
+                            res.send("Data inserted successfully");
                             return [2 /*return*/];
                     }
                 });
@@ -217,7 +218,6 @@ router.get("/addC/:username", function (req, res) { return __awaiter(void 0, voi
             res.send("Error fetching data" + error);
         })
             .end();
-        res.send("Data inserted successfully");
         return [2 /*return*/];
     });
 }); });

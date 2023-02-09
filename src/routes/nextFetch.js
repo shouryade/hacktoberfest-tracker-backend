@@ -86,7 +86,7 @@ router.get('/verifyDB/:orgName', function (req, res) { return __awaiter(void 0, 
         }
     });
 }); });
-router.get('/:orgName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+router.get('/next/:orgName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var orgName, orgRepo, data;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -94,9 +94,9 @@ router.get('/:orgName', function (req, res) { return __awaiter(void 0, void 0, v
                 orgName = req.params.orgName;
                 orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
                 return [4 /*yield*/, orgRepo.createQueryBuilder('org')
-                        .select('*')
+                        .select('org.id')
                         .where('org.uName = :uName', { uName: orgName })
-                        .leftJoinAndSelect('org.repos.name', 'repos')
+                        .leftJoinAndSelect('org.repos', 'repos')
                         .getOne()];
             case 1:
                 data = _a.sent();
@@ -105,16 +105,15 @@ router.get('/:orgName', function (req, res) { return __awaiter(void 0, void 0, v
         }
     });
 }); });
-router.get('/:orgName/:repo', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var repoRepo, orgName, repoName, data;
+router.get('/next/:orgName/:repo', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var repoRepo, repoName, data;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
-                orgName = req.params.orgName;
                 repoName = req.params.repo;
                 return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
-                        .select('*')
+                        .select('repo.id')
                         .where("repo.name = :repoName", { repoName: repoName })
                         .getOne()];
             case 1:
@@ -124,10 +123,41 @@ router.get('/:orgName/:repo', function (req, res) { return __awaiter(void 0, voi
         }
     });
 }); });
-router.get('/:orgName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var orgName;
+router.get('/contributors/:orgName/:repo/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var repoRepo, repoName, data;
     return __generator(this, function (_a) {
-        orgName = req.params.orgName;
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
+                repoName = req.params.repo;
+                return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
+                        .select('repo.id')
+                        .where('repo.name = :repo', { repo: repoName })
+                        .leftJoinAndSelect('repo.contributions', 'contributions')
+                        .getOne()];
+            case 1:
+                data = _a.sent();
+                res.json(data);
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.get('/issues/:orgName/:repo/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var repoRepo, repoName, data;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
+                repoName = req.params.repo;
+                return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
+                        .select('repo.id')
+                        .where('repo.name = :repo', { repo: repoName })
+                        .leftJoinAndSelect('repo.issues', 'issues')
+                        .getOne()];
+            case 1:
+                data = _a.sent();
+                res.json(data);
+                return [2 /*return*/];
+        }
     });
 }); });
