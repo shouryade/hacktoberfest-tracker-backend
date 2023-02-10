@@ -94,7 +94,6 @@ router.get('/next/:orgName', function (req, res) { return __awaiter(void 0, void
                 orgName = req.params.orgName;
                 orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
                 return [4 /*yield*/, orgRepo.createQueryBuilder('org')
-                        .select('org.id')
                         .where('org.uName = :uName', { uName: orgName })
                         .leftJoinAndSelect('org.repos', 'repos')
                         .getOne()];
@@ -113,7 +112,6 @@ router.get('/next/:orgName/:repo', function (req, res) { return __awaiter(void 0
                 repoRepo = connection_1.AppDataSource.getRepository(repo_1.Repo);
                 repoName = req.params.repo;
                 return [4 /*yield*/, repoRepo.createQueryBuilder('repo')
-                        .select('repo.id')
                         .where("repo.name = :repoName", { repoName: repoName })
                         .getOne()];
             case 1:

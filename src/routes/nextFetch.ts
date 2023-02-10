@@ -51,7 +51,6 @@ router.get('/next/:orgName',async (req,res) => {
     const data = await orgRepo.createQueryBuilder(
         'org'
     )
-    .select('org.id')
     .where('org.uName = :uName',{uName:orgName})
     .leftJoinAndSelect(
         'org.repos',
@@ -71,7 +70,6 @@ router.get('/next/:orgName/:repo',async (req,res) => {
     const data = await repoRepo.createQueryBuilder(
         'repo'
     )
-    .select('repo.id')
     .where("repo.name = :repoName",{repoName:repoName})
     .getOne()
 
