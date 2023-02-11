@@ -92,6 +92,7 @@ router.get('/next/:orgName', function (req, res) { return __awaiter(void 0, void
         switch (_a.label) {
             case 0:
                 orgName = req.params.orgName;
+                console.log(orgName);
                 orgRepo = connection_1.AppDataSource.getRepository(org_1.Org);
                 return [4 /*yield*/, orgRepo.createQueryBuilder('org')
                         .where('org.uName = :uName', { uName: orgName })
