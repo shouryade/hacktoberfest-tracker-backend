@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.get('/verifyDB/:orgName',async (req,res) => {
     const orgName = req.params.orgName;
+    console.log(orgName);
     let onGithub;
     try {
         onGithub = await octo.request("GET /orgs/{owner}", {
